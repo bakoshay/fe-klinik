@@ -1,8 +1,11 @@
 <template>
-  <Header />
+  <div>
+    <Header />
+    <Sidebar />
 
-  <div class="mt-2.5">
-    <slot />
+    <main class="ml-64 pt-24 px-4 pb-4">
+      <slot />
+    </main>
   </div>
 </template>
 
