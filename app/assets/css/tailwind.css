@@ -1,1 +1,13 @@
 @import 'tailwindcss';
+
+@theme {
+  --color-primary: #c5dbed;
+  --color-primary-blue: #598af2;
+  --color-primary-dark: #273a53;
+  --color-primary-light: #fffdfd;
+  --color-primary-gray: #dae0e5;
+}
+
+body {
+  @apply bg-primary-gray min-h-screen;
+}
