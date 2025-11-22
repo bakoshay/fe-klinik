@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@nuxt/icon": "^2.1.0",
+    "@primeuix/themes": "^1.2.5",
+    "@primevue/nuxt-module": "^4.4.1",
     "@tailwindcss/vite": "^4.1.17",
     "nuxt": "^4.2.1",
     "tailwindcss": "^4.1.17",
