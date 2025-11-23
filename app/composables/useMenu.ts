@@ -13,12 +13,12 @@ export const useMenu = () => {
     {
       title: 'Manajemen Dokter',
       icon: 'mdi:doctor',
-      path: '/dokter',
+      path: '/manajemen-dokter',
     },
     {
       title: 'Pengelolaan Obat',
       icon: 'mdi:pill',
-      path: '/obat',
+      path: '/pengelolaan-obat',
     },
     {
       title: 'Pembayaran',
