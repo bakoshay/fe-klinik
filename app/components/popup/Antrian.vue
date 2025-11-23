@@ -3,7 +3,7 @@
     :visible="visible"
     @update:visible="updateVisible"
     position="center"
-    :closable="true"
+    :closable="false"
     :modal="true"
     :pt="{
       header: { class: '!p-0' },
