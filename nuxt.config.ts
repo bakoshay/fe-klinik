@@ -36,7 +36,7 @@ const MyPreset = definePreset(Aura, {
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  css: ['./app/assets/css/tailwind.css'],
+  css: ['./app/assets/css/tailwind.css', 'primeicons/primeicons.css'],
 
   vite: {
     plugins: [tailwindcss()],
