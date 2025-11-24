@@ -49,16 +49,13 @@
 </template>
 
 <script lang="ts" setup>
+import useHelper from '~/utils/helper';
 definePageMeta({
   layout: 'custom',
 });
 
 const visible = ref(false);
-
-const jenisKelaminOptions = ref([
-  { label: 'Laki-laki', value: 'L' },
-  { label: 'Perempuan', value: 'P' },
-]);
+const jenisKelaminOptions = useHelper().jenisKelamin;
 
 const handleClickAntrian = () => {
   visible.value = true;
