@@ -31,11 +31,14 @@
 </template>
 
 <script lang="ts" setup>
+import useHelper from '~/utils/helper';
+
 definePageMeta({
   layout: 'custom',
 });
 
 const daySelected = ref('senin');
+const days = useHelper().days;
 
 const onDayChange = (value: string) => {
   daySelected.value = value;
@@ -66,15 +69,5 @@ const docters = ref([
     schedule: '09.00 - 13.00',
     status: true,
   },
-]);
-
-const days = ref([
-  { label: 'Senin', value: 'senin' },
-  { label: 'Selasa', value: 'selasa' },
-  { label: 'Rabu', value: 'rabu' },
-  { label: 'Kamis', value: 'kamis' },
-  { label: "Jum'at", value: 'jumat' },
-  { label: 'Sabtu', value: 'sabtu' },
-  { label: 'Minggu', value: 'minggu' },
 ]);
 </script>
