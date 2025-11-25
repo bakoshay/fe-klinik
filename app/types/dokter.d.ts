@@ -4,8 +4,10 @@ export interface Dokter {
   gender: 'L' | 'P';
   phone: string;
   address: string;
-  practiceDays: string[];
-  startTime: string;
-  endTime: string;
+  schedules: {
+    day: string;
+    start: string | null;
+    end: string | null;
+  }[];
   is_active: boolean;
 }
