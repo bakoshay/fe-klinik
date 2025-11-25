@@ -14,16 +14,21 @@ export default function useHelper() {
     { label: 'Perempuan', value: 'P' },
   ]);
 
-  const spesialis = ref([
-    { label: 'Umum', value: 'umum' },
-    { label: 'Gigi', value: 'gigi' },
-    { label: 'Kandungan', value: 'kandungan' },
-    { label: 'Anak', value: 'anak' },
-  ]);
-
   const status = ref([
     { label: 'Hadir', value: true },
     { label: 'Tidak Hadir', value: false },
+  ]);
+
+  const schedule = ref<
+    Array<{ day: string; selected: boolean; start: string | null; end: string | null }>
+  >([
+    { day: 'senin', selected: false, start: null, end: null },
+    { day: 'selasa', selected: false, start: null, end: null },
+    { day: 'rabu', selected: false, start: null, end: null },
+    { day: 'kamis', selected: false, start: null, end: null },
+    { day: 'jumat', selected: false, start: null, end: null },
+    { day: 'sabtu', selected: false, start: null, end: null },
+    { day: 'minggu', selected: false, start: null, end: null },
   ]);
 
   const parseTime = (timeStr: string): Date => {
@@ -39,5 +44,5 @@ export default function useHelper() {
     return `${hours}:${minutes}`;
   };
 
-  return { days, jenisKelamin, spesialis, status, parseTime, formatTime };
+  return { days, jenisKelamin, status, parseTime, formatTime, schedule };
 }
