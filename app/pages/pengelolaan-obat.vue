@@ -87,10 +87,6 @@ const dataObat = ref<Obat | null>(null);
 const confirm = useConfirm();
 const toast = useToast();
 
-const capitalizeFirst = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
-
 const handleTriggerUpdate = (data: Obat) => {
   dataObat.value = data;
   visible.value = true;
