@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <Header />
+  <Header />
 
-    <main class="pt-24">
-      <slot />
-    </main>
-  </div>
+  <main class="pt-24">
+    <slot />
+  </main>
 </template>
 
 <script lang="ts" setup></script>
