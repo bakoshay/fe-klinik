@@ -110,9 +110,13 @@ const props = defineProps({
 });
 
 const jenisKelaminOptions = useHelper().jenisKelamin;
-const statusOptions = useHelper().status;
-
 const schedule = useHelper().schedule;
+
+const statusOptions = ref([
+  { label: 'Hadir', value: true },
+  { label: 'Tidak Hadir', value: false },
+]);
+
 const emit = defineEmits<{
   'update:visible': [value: boolean];
 }>();

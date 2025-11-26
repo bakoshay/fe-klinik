@@ -23,7 +23,7 @@
         scrollable
         tableStyle="min-width: 80rem"
       >
-        <Column header="No" bodyClass="!text-center">
+        <Column header="No" class="col-center">
           <template #body="slotProps">
             {{ slotProps.index + 1 }}
           </template>
@@ -56,7 +56,7 @@
           </template>
         </Column>
 
-        <Column header="Status" bodyClass="!text-center">
+        <Column header="Status">
           <template #body="{ data }">
             <Tag
               :value="data.is_active ? 'Hadir' : 'Tidak Hadir'"
@@ -65,9 +65,9 @@
           </template>
         </Column>
 
-        <Column header="Aksi" bodyClass="!text-center">
+        <Column header="Aksi">
           <template #body="{ data }">
-            <div class="flex gap-2">
+            <div class="flex gap-2 w-full items-center">
               <Button severity="secondary" rounded @click="handleTriggerUpdate(data)">
                 <Icon name="ph:note-pencil-bold" size="16" style="color: green" />
               </Button>
@@ -179,3 +179,14 @@ const dokterData = ref<Dokter[]>([
   },
 ]);
 </script>
+
+<style scoped>
+/* center header */
+:deep(.p-datatable-column-header-content) {
+  justify-content: center !important;
+}
+/* center body */
+:deep(.p-datatable-tbody > tr > td) {
+  text-align: center !important;
+}
+</style>
