@@ -56,7 +56,7 @@
           <template #body="{ data }">
             <div class="flex flex-col">
               <div v-for="(j, i) in data.jadwal_dokter" :key="i">
-                {{ capitalizeFirst(j.hari) }} ({{ j.jam_mulai }} - {{ j.jam_selesai }})
+                {{ useHelper().capitalizeFirst(j.hari) }} ({{ j.jam_mulai }} - {{ j.jam_selesai }})
               </div>
             </div>
           </template>
@@ -97,6 +97,7 @@
 
 <script lang="ts" setup>
 import { useDokter } from '@/composables/api/useDokter';
+import useHelper from '~/utils/helper';
 import type { Dokter } from '@/types/dokter';
 
 definePageMeta({
@@ -111,10 +112,6 @@ const selectedDokter = ref<Dokter | null>(null);
 
 const { getAll, deleteDokter } = useDokter();
 const { data } = await useAsyncData('dokter', () => getAll('').then((res) => res.data.value));
-
-const capitalizeFirst = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
 
 const handleTriggerUpdate = (data: Dokter) => {
   selectedDokter.value = data;
