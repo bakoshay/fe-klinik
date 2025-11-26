@@ -14,11 +14,6 @@ export default function useHelper() {
     { label: 'Perempuan', value: 'P' },
   ]);
 
-  const status = ref([
-    { label: 'Hadir', value: true },
-    { label: 'Tidak Hadir', value: false },
-  ]);
-
   const schedule = ref<
     Array<{ day: string; selected: boolean; start: string | null; end: string | null }>
   >([
@@ -44,5 +39,5 @@ export default function useHelper() {
     return `${hours}:${minutes}`;
   };
 
-  return { days, jenisKelamin, status, parseTime, formatTime, schedule };
+  return { days, jenisKelamin, parseTime, formatTime, schedule };
 }
