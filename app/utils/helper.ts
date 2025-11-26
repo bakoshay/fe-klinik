@@ -39,5 +39,9 @@ export default function useHelper() {
     return `${hours}:${minutes}`;
   };
 
-  return { days, jenisKelamin, parseTime, formatTime, schedule };
+  const capitalizeFirst = (str: string) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
+  return { days, jenisKelamin, parseTime, formatTime, schedule, capitalizeFirst };
 }
