@@ -91,7 +91,12 @@
       <!-- Footer -->
       <div class="w-full flex justify-end gap-2 px-6 py-4">
         <BaseButton color="secondary" label="Batal" size="sm" @click="updateVisible(false)" />
-        <BaseButton color="primary-blue" :label="data ? 'Ubah' : 'Simpan'" size="sm" />
+        <BaseButton
+          color="primary-blue"
+          :label="data ? 'Ubah' : 'Simpan'"
+          size="sm"
+          @click="handleSubmit"
+        />
       </div>
     </template>
   </Dialog>
@@ -99,6 +104,7 @@
 
 <script setup lang="ts">
 import useHelper from '~/utils/helper';
+import { useDokter } from '@/composables/api/useDokter';
 import type { Dokter } from '~/types/dokter';
 
 const props = defineProps({
@@ -111,6 +117,8 @@ const props = defineProps({
 
 const jenisKelaminOptions = useHelper().jenisKelamin;
 const schedule = useHelper().schedule;
+const toast = useToast();
+const { createDokter, updateDokter } = useDokter();
 
 const statusOptions = ref([
   { label: 'Hadir', value: true },
@@ -119,6 +127,7 @@ const statusOptions = ref([
 
 const emit = defineEmits<{
   'update:visible': [value: boolean];
+  saved: [];
 }>();
 
 const updateVisible = (value: boolean) => {
@@ -130,7 +139,6 @@ const updateVisible = (value: boolean) => {
 
 const form = ref({
   name: '',
-  specialty: '',
   gender: '' as 'L' | 'P' | '',
   phone: '',
   address: '',
@@ -141,7 +149,6 @@ const form = ref({
 const resetForm = () => {
   form.value = {
     name: '',
-    specialty: '',
     gender: '',
     phone: '',
     address: '',
@@ -157,36 +164,90 @@ const resetForm = () => {
   }));
 };
 
+const handleSubmit = async () => {
+  try {
+    const payload = {
+      name: form.value.name,
+      specialty: 'Umum',
+      gender: form.value.gender,
+      phone: form.value.phone,
+      address: form.value.address,
+      is_active: form.value.is_active,
+      schedules: schedule.value
+        .filter((s) => s.selected && s.start && s.end)
+        .map((s) => ({
+          day: s.day,
+          start: s.start as string,
+          end: s.end as string,
+        })),
+    };
+
+    if (props.data) {
+      // update
+      const response = await updateDokter(props.data.id, payload);
+
+      toast.add({
+        severity: 'success',
+        summary: 'Sukses',
+        detail: response.data.value?.message,
+        life: 3000,
+      });
+    } else {
+      // create
+      const response = await createDokter(payload);
+
+      toast.add({
+        severity: 'success',
+        summary: 'Sukses',
+        detail: response.data.value?.message,
+        life: 3000,
+      });
+    }
+
+    emit('saved');
+    updateVisible(false);
+  } catch (error) {
+    console.error('Error:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error,
+      life: 3000,
+    });
+
+    updateVisible(false);
+  }
+};
+
 // Watch untuk detect perubahan data (saat edit)
 watch(
   () => props.data,
   (newData) => {
     if (newData) {
       form.value = {
-        name: newData.name,
-        specialty: newData.specialty,
-        gender: newData.gender,
-        phone: newData.phone,
-        address: newData.address,
-        schedules: newData.schedules
-          .filter((s) => typeof s.start === 'string' && typeof s.end === 'string')
+        name: newData.nama,
+        gender: newData.jenis_kelamin,
+        phone: newData.handphone,
+        address: newData.alamat,
+        schedules: newData.jadwal_dokter
+          .filter((s) => typeof s.jam_mulai === 'string' && typeof s.jam_selesai === 'string')
           .map((s) => ({
-            day: s.day,
-            start: s.start as string,
-            end: s.end as string,
+            day: s.hari,
+            start: s.jam_mulai as string,
+            end: s.jam_selesai as string,
           })),
-        is_active: newData.is_active,
+        is_active: newData.status,
       };
 
       // Mapping schedules ke UI checkbox
       schedule.value = schedule.value.map((d) => {
-        const found = newData.schedules.find((s) => s.day === d.day);
+        const found = newData.jadwal_dokter.find((s) => s.hari === d.day);
         return found
           ? {
               day: d.day,
               selected: true,
-              start: found.start,
-              end: found.end,
+              start: found.jam_mulai,
+              end: found.jam_selesai,
             }
           : { ...d, selected: false, start: null, end: null };
       });

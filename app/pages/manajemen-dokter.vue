@@ -11,12 +11,18 @@
     </div>
 
     <!-- search bar -->
-    <InputText placeholder="Cari dokter..." size="small" class="w-1/3" />
+    <InputText
+      placeholder="Cari dokter..."
+      size="small"
+      class="w-1/3"
+      v-model="searchQuery"
+      @keyup.enter="handleSearch"
+    />
 
     <!-- table -->
     <div class="w-full">
       <DataTable
-        :value="dokterData"
+        :value="data?.data"
         paginator
         :rows="5"
         show-gridlines
@@ -29,28 +35,28 @@
           </template>
         </Column>
 
-        <Column field="name" header="Nama"></Column>
+        <Column field="nama" header="Nama"></Column>
 
-        <Column field="specialty" header="Spesialis">
+        <Column field="spesialis" header="Spesialis">
           <template #body="{ data }">
-            {{ data.specialty.charAt(0).toUpperCase() + data.specialty.slice(1) }}
+            {{ data.spesialis.charAt(0).toUpperCase() + data.spesialis.slice(1) }}
           </template>
         </Column>
 
-        <Column field="gender" header="Jenis Kelamin">
+        <Column field="jenis_kelamin" header="Jenis Kelamin">
           <template #body="{ data }">
-            {{ data.gender === 'L' ? 'Laki-laki' : 'Perempuan' }}
+            {{ data.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}
           </template>
         </Column>
 
-        <Column field="phone" header="No HP"></Column>
-        <Column field="address" header="Alamat"></Column>
+        <Column field="handphone" header="No HP"></Column>
+        <Column field="alamat" header="Alamat"></Column>
 
         <Column header="Jadwal Praktek">
           <template #body="{ data }">
             <div class="flex flex-col">
-              <div v-for="(j, i) in data.schedules" :key="i">
-                {{ capitalizeFirst(j.day) }} ({{ j.start }} - {{ j.end }})
+              <div v-for="(j, i) in data.jadwal_dokter" :key="i">
+                {{ capitalizeFirst(j.hari) }} ({{ j.jam_mulai }} - {{ j.jam_selesai }})
               </div>
             </div>
           </template>
@@ -59,8 +65,8 @@
         <Column header="Status">
           <template #body="{ data }">
             <Tag
-              :value="data.is_active ? 'Hadir' : 'Tidak Hadir'"
-              :severity="data.is_active ? 'success' : 'danger'"
+              :value="data.status ? 'Hadir' : 'Tidak Hadir'"
+              :severity="data.status ? 'success' : 'danger'"
             />
           </template>
         </Column>
@@ -71,7 +77,7 @@
               <Button severity="secondary" rounded @click="handleTriggerUpdate(data)">
                 <Icon name="ph:note-pencil-bold" size="16" style="color: green" />
               </Button>
-              <Button severity="secondary" rounded @click="confirmDelete">
+              <Button severity="secondary" rounded @click="confirmDelete(data.id)">
                 <Icon name="ph:trash-bold" size="16" style="color: red" />
               </Button>
             </div>
@@ -81,10 +87,16 @@
     </div>
   </div>
 
-  <FormManajemenDokter :visible="visible" :data="dataDokter" @update:visible="visible = $event" />
+  <FormManajemenDokter
+    :visible="visible"
+    :data="selectedDokter"
+    @update:visible="visible = $event"
+    @saved="fetchDokter"
+  />
 </template>
 
 <script lang="ts" setup>
+import { useDokter } from '@/composables/api/useDokter';
 import type { Dokter } from '@/types/dokter';
 
 definePageMeta({
@@ -92,20 +104,34 @@ definePageMeta({
 });
 
 const visible = ref(false);
-const dataDokter = ref<Dokter | null>(null);
 const confirm = useConfirm();
 const toast = useToast();
+const searchQuery = ref('');
+const selectedDokter = ref<Dokter | null>(null);
+
+const { getAll, deleteDokter } = useDokter();
+const { data } = await useAsyncData('dokter', () => getAll('').then((res) => res.data.value));
 
 const capitalizeFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 const handleTriggerUpdate = (data: Dokter) => {
-  dataDokter.value = data;
+  selectedDokter.value = data;
   visible.value = true;
 };
 
-const confirmDelete = () => {
+const handleSearch = async () => {
+  const res = await getAll(searchQuery.value);
+  data.value = res.data.value;
+};
+
+const fetchDokter = async () => {
+  const res = await getAll('');
+  data.value = res.data.value;
+};
+
+const confirmDelete = (id: string) => {
   confirm.require({
     message: 'Apakah Anda yakin ingin menghapus data ini?',
     header: 'Hapus Data',
@@ -120,64 +146,42 @@ const confirmDelete = () => {
       label: 'Hapus',
       severity: 'danger',
     },
-    accept: () => {
-      toast.add({
-        severity: 'success',
-        summary: 'Confirmed',
-        detail: 'Record deleted',
-        life: 3000,
-      });
+    accept: async () => {
+      const response = await deleteDokter(id);
+
+      if (response.data.value?.status === true) {
+        fetchDokter();
+        toast.add({
+          severity: 'success',
+          summary: 'Sukses',
+          detail: response.data.value?.message,
+          life: 3000,
+        });
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Gagal',
+          detail: response.data.value?.message,
+          life: 3000,
+        });
+      }
     },
   });
 };
 
-// Reset dataDokter saat dialog ditutup untuk mode tambah
-watch(visible, (newVal) => {
-  if (!newVal) {
-    dataDokter.value = null;
+watch(searchQuery, async (val) => {
+  if (!val) {
+    const res = await getAll('');
+    data.value = res.data.value;
   }
 });
 
-const dokterData = ref<Dokter[]>([
-  {
-    name: 'Dr. Aulia Pratama',
-    specialty: 'umum',
-    gender: 'L',
-    phone: '081234567890',
-    address: 'Jl. Merdeka No. 10, Jakarta',
-    schedules: [
-      { day: 'senin', start: '08:00', end: '16:00' },
-      { day: 'selasa', start: '08:00', end: '16:00' },
-      { day: 'rabu', start: '08:00', end: '16:00' },
-    ],
-    is_active: true,
-  },
-  {
-    name: 'Dr. Siti Nurhaliza',
-    specialty: 'anak',
-    gender: 'P',
-    phone: '081234567891',
-    address: 'Jl. Sudirman No. 25, Jakarta',
-    schedules: [
-      { day: 'senin', start: '09:00', end: '17:00' },
-      { day: 'rabu', start: '09:00', end: '17:00' },
-      { day: 'sabtu', start: '09:00', end: '17:00' },
-    ],
-    is_active: true,
-  },
-  {
-    name: 'Dr. Ahmad Fauzi',
-    specialty: 'gigi',
-    gender: 'L',
-    phone: '081234567894',
-    address: 'Jl. Rasuna Said No. 5, Jakarta',
-    schedules: [
-      { day: 'selasa', start: '09:00', end: '16:00' },
-      { day: 'kamis', start: '09:00', end: '16:00' },
-    ],
-    is_active: false,
-  },
-]);
+// Reset dataDokter saat dialog ditutup untuk mode tambah
+watch(visible, (newVal) => {
+  if (!newVal) {
+    selectedDokter.value = null;
+  }
+});
 </script>
 
 <style scoped>
