@@ -21,7 +21,7 @@
     <!-- content -->
     <div class="px-6 w-full items-start flex flex-col gap-4">
       <div class="flex flex-col items-start w-full gap-1">
-        <label for="name" class="font-semibold text-sm">Nama Dokter</label>
+        <label for="name" class="font-semibold text-sm">Nama Obat</label>
         <InputText
           id="name"
           v-model="form.name"
@@ -32,55 +32,40 @@
         />
       </div>
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="jeniskelamin" class="font-semibold text-sm">Jenis Kelamin</label>
+        <label for="jenisObat" class="font-semibold text-sm">Jenis Obat</label>
         <Select
-          id="jeniskelamin"
-          v-model="form.gender"
+          id="jenisObat"
+          v-model="form.type_of_drug"
           fluid
           size="small"
-          placeholder="Pilih jenis kelamin"
-          :options="jenisKelaminOptions"
+          placeholder="Pilih jenis obat"
+          :options="jenisObatOptions"
           option-label="label"
           option-value="value"
         />
       </div>
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="alamat" class="font-semibold text-sm">Alamat</label>
-        <Textarea id="alamat" v-model="form.address" fluid placeholder="Masukan alamat" />
-      </div>
-      <div class="flex flex-col items-start w-full gap-2">
-        <label for="nohp" class="font-semibold text-sm">No HP</label>
-        <InputText
-          id="nohp"
-          v-model="form.phone"
-          type="tel"
+        <label for="harga" class="font-semibold text-sm">Harga</label>
+        <InputNumber
+          id="harga"
+          v-model="form.price"
+          mode="currency"
+          currency="IDR"
+          locale="id-ID"
           fluid
           size="small"
-          placeholder="Masukan No HP"
+          placeholder="Masukan harga"
         />
       </div>
       <div class="flex flex-col items-start w-full gap-2">
-        <p class="font-semibold text-sm">Jadwal Praktek</p>
-        <div class="grid gap-4 w-full">
-          <div v-for="(item, i) in schedule" :key="i" class="flex items-center gap-4">
-            <Checkbox v-model="item.selected" :binary="true" />
-
-            <span class="w-24 capitalize">{{ item.day }}</span>
-
-            <InputText type="time" v-model="item.start" :disabled="!item.selected" />
-            <InputText type="time" v-model="item.end" :disabled="!item.selected" />
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-col items-start w-full gap-2">
-        <label for="status" class="font-semibold text-sm">Status</label>
+        <label for="status" class="font-semibold text-sm">Status Stock</label>
         <Select
           id="status"
           v-model="form.is_active"
           fluid
           size="small"
-          placeholder="Pilih status"
-          :options="statusOptions"
+          placeholder="Pilih status stock"
+          :options="stockOptions"
           option-label="label"
           option-value="value"
         />
@@ -99,20 +84,29 @@
 
 <script setup lang="ts">
 import useHelper from '~/utils/helper';
-import type { Dokter } from '~/types/dokter';
+import type { Obat } from '~/types/obat';
 
 const props = defineProps({
   visible: Boolean,
   data: {
-    type: Object as () => Dokter | null,
+    type: Object as () => Obat | null,
     default: null,
   },
 });
 
-const jenisKelaminOptions = useHelper().jenisKelamin;
-const statusOptions = useHelper().status;
-
 const schedule = useHelper().schedule;
+
+const jenisObatOptions = ref([
+  { label: 'Tablet', value: 'tablet' },
+  { label: 'Kapsul', value: 'kapsul' },
+  { label: 'Kaplet', value: 'kaplet' },
+]);
+
+const stockOptions = ref([
+  { label: 'Tersedia', value: true },
+  { label: 'Tidak Tersedia', value: false },
+]);
+
 const emit = defineEmits<{
   'update:visible': [value: boolean];
 }>();
@@ -126,31 +120,18 @@ const updateVisible = (value: boolean) => {
 
 const form = ref({
   name: '',
-  specialty: '',
-  gender: '' as 'L' | 'P' | '',
-  phone: '',
-  address: '',
-  schedules: [] as Array<{ day: string; start: string; end: string }>,
+  type_of_drug: '' as 'tablet' | 'kapsul' | 'kaplet' | '',
+  price: 0,
   is_active: true,
 });
 
 const resetForm = () => {
   form.value = {
     name: '',
-    specialty: '',
-    gender: '',
-    phone: '',
-    address: '',
-    schedules: [],
+    type_of_drug: '' as 'tablet' | 'kapsul' | 'kaplet' | '',
+    price: 0,
     is_active: true,
   };
-
-  schedule.value = schedule.value.map((x) => ({
-    ...x,
-    selected: false,
-    start: null,
-    end: null,
-  }));
 };
 
 // Watch untuk detect perubahan data (saat edit)
@@ -160,32 +141,10 @@ watch(
     if (newData) {
       form.value = {
         name: newData.name,
-        specialty: newData.specialty,
-        gender: newData.gender,
-        phone: newData.phone,
-        address: newData.address,
-        schedules: newData.schedules
-          .filter((s) => typeof s.start === 'string' && typeof s.end === 'string')
-          .map((s) => ({
-            day: s.day,
-            start: s.start as string,
-            end: s.end as string,
-          })),
+        type_of_drug: newData.type_of_drug,
+        price: newData.price,
         is_active: newData.is_active,
       };
-
-      // Mapping schedules ke UI checkbox
-      schedule.value = schedule.value.map((d) => {
-        const found = newData.schedules.find((s) => s.day === d.day);
-        return found
-          ? {
-              day: d.day,
-              selected: true,
-              start: found.start,
-              end: found.end,
-            }
-          : { ...d, selected: false, start: null, end: null };
-      });
     } else resetForm();
   },
   { immediate: true }

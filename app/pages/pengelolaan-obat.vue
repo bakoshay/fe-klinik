@@ -16,14 +16,14 @@
     <!-- table -->
     <div class="w-full">
       <DataTable
-        :value="dokterData"
+        :value="obatData"
         paginator
         :rows="5"
         show-gridlines
         scrollable
         tableStyle="min-width: 80rem"
       >
-        <Column header="No" bodyClass="!text-center">
+        <Column header="No" headerStyle="text-align:center">
           <template #body="slotProps">
             {{ slotProps.index + 1 }}
           </template>
@@ -31,43 +31,34 @@
 
         <Column field="name" header="Nama"></Column>
 
-        <Column field="specialty" header="Spesialis">
+        <Column field="type_of_drug" header="Jenis Obat">
           <template #body="{ data }">
-            {{ data.specialty.charAt(0).toUpperCase() + data.specialty.slice(1) }}
+            {{ data.type_of_drug.charAt(0).toUpperCase() + data.type_of_drug.slice(1) }}
           </template>
         </Column>
 
-        <Column field="gender" header="Jenis Kelamin">
+        <Column field="price" header="Harga">
           <template #body="{ data }">
-            {{ data.gender === 'L' ? 'Laki-laki' : 'Perempuan' }}
+            {{
+              new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(
+                data.price
+              )
+            }}
           </template>
         </Column>
 
-        <Column field="phone" header="No HP"></Column>
-        <Column field="address" header="Alamat"></Column>
-
-        <Column header="Jadwal Praktek">
-          <template #body="{ data }">
-            <div class="flex flex-col">
-              <div v-for="(j, i) in data.schedules" :key="i">
-                {{ capitalizeFirst(j.day) }} ({{ j.start }} - {{ j.end }})
-              </div>
-            </div>
-          </template>
-        </Column>
-
-        <Column header="Status" bodyClass="!text-center">
+        <Column header="Status">
           <template #body="{ data }">
             <Tag
-              :value="data.is_active ? 'Hadir' : 'Tidak Hadir'"
+              :value="data.is_active ? 'Tersedia' : 'Tidak Tersedia'"
               :severity="data.is_active ? 'success' : 'danger'"
             />
           </template>
         </Column>
 
-        <Column header="Aksi" bodyClass="!text-center">
+        <Column header="Aksi">
           <template #body="{ data }">
-            <div class="flex gap-2">
+            <div class="flex gap-2 w-full items-center justify-center">
               <Button severity="secondary" rounded @click="handleTriggerUpdate(data)">
                 <Icon name="ph:note-pencil-bold" size="16" style="color: green" />
               </Button>
@@ -81,18 +72,18 @@
     </div>
   </div>
 
-  <FormPengelolaanObat :visible="visible" :data="dataDokter" @update:visible="visible = $event" />
+  <FormPengelolaanObat :visible="visible" :data="dataObat" @update:visible="visible = $event" />
 </template>
 
 <script lang="ts" setup>
-import type { Dokter } from '@/types/dokter';
+import type { Obat } from '@/types/obat';
 
 definePageMeta({
   layout: 'custom',
 });
 
 const visible = ref(false);
-const dataDokter = ref<Dokter | null>(null);
+const dataObat = ref<Obat | null>(null);
 const confirm = useConfirm();
 const toast = useToast();
 
@@ -100,8 +91,8 @@ const capitalizeFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const handleTriggerUpdate = (data: Dokter) => {
-  dataDokter.value = data;
+const handleTriggerUpdate = (data: Obat) => {
+  dataObat.value = data;
   visible.value = true;
 };
 
@@ -134,48 +125,51 @@ const confirmDelete = () => {
 // Reset dataDokter saat dialog ditutup untuk mode tambah
 watch(visible, (newVal) => {
   if (!newVal) {
-    dataDokter.value = null;
+    dataObat.value = null;
   }
 });
 
-const dokterData = ref<Dokter[]>([
+const obatData = ref<Obat[]>([
   {
-    name: 'Dr. Aulia Pratama',
-    specialty: 'umum',
-    gender: 'L',
-    phone: '081234567890',
-    address: 'Jl. Merdeka No. 10, Jakarta',
-    schedules: [
-      { day: 'senin', start: '08:00', end: '16:00' },
-      { day: 'selasa', start: '08:00', end: '16:00' },
-      { day: 'rabu', start: '08:00', end: '16:00' },
-    ],
+    name: 'Paracetamol',
+    type_of_drug: 'tablet',
+    price: 5000,
     is_active: true,
   },
   {
-    name: 'Dr. Siti Nurhaliza',
-    specialty: 'anak',
-    gender: 'P',
-    phone: '081234567891',
-    address: 'Jl. Sudirman No. 25, Jakarta',
-    schedules: [
-      { day: 'senin', start: '09:00', end: '17:00' },
-      { day: 'rabu', start: '09:00', end: '17:00' },
-      { day: 'sabtu', start: '09:00', end: '17:00' },
-    ],
+    name: 'Amoxicillin',
+    type_of_drug: 'kapsul',
+    price: 15000,
+    is_active: false,
+  },
+  {
+    name: 'Ibuprofen',
+    type_of_drug: 'kaplet',
+    price: 8000,
     is_active: true,
   },
   {
-    name: 'Dr. Ahmad Fauzi',
-    specialty: 'gigi',
-    gender: 'L',
-    phone: '081234567894',
-    address: 'Jl. Rasuna Said No. 5, Jakarta',
-    schedules: [
-      { day: 'selasa', start: '09:00', end: '16:00' },
-      { day: 'kamis', start: '09:00', end: '16:00' },
-    ],
+    name: 'Cetirizine',
+    type_of_drug: 'tablet',
+    price: 6000,
+    is_active: true,
+  },
+  {
+    name: 'Doxycycline',
+    type_of_drug: 'kapsul',
+    price: 20000,
     is_active: false,
   },
 ]);
 </script>
+
+<style scoped>
+/* center header */
+:deep(.p-datatable-column-header-content) {
+  justify-content: center !important;
+}
+/* center body */
+:deep(.p-datatable-tbody > tr > td) {
+  text-align: center !important;
+}
+</style>
