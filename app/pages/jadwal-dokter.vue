@@ -17,13 +17,17 @@
       >
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 w-full">
+    <h2 v-if="!data?.data.length" class="font-bold text-primary-dark text-xl">
+      {{ `Tidak Ada Jadwal Dokter Pada Hari ${useHelper().capitalizeFirst(daySelected)}` }}
+    </h2>
+
+    <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 w-full">
       <CardJadwalDokter
-        v-for="(docter, index) in docters"
+        v-for="(docter, index) in data?.data"
         :key="index"
-        :name="docter.name"
-        :specialty="docter.specialty"
-        :schedule="docter.schedule"
+        :name="docter.nama"
+        :specialty="docter.spesialis"
+        :schedule="docter.jadwal_dokter.map((j) => `${j.jam_mulai} - ${j.jam_selesai}`).join(', ')"
         :status="docter.status"
       />
     </div>
@@ -32,6 +36,7 @@
 
 <script lang="ts" setup>
 import useHelper from '~/utils/helper';
+import { useDokter } from '@/composables/api/useDokter';
 
 definePageMeta({
   layout: 'custom',
@@ -40,34 +45,16 @@ definePageMeta({
 const daySelected = ref('senin');
 const days = useHelper().days;
 
+const { getByDay } = useDokter();
+const { data } = await useAsyncData('dokter-by-day', () =>
+  getByDay(daySelected.value).then((res) => res.data.value)
+);
+
 const onDayChange = (value: string) => {
   daySelected.value = value;
-};
 
-const docters = ref([
-  {
-    name: 'Dr. Aulia Pratama',
-    specialty: 'Umum',
-    schedule: '08.00 - 12.00',
-    status: true,
-  },
-  {
-    name: 'Dr. Siti Aminah',
-    specialty: 'Gigi',
-    schedule: '10.00 - 14.00',
-    status: false,
-  },
-  {
-    name: 'Dr. Budi Santoso',
-    specialty: 'Kandungan',
-    schedule: '12.00 - 16.00',
-    status: true,
-  },
-  {
-    name: 'Dr. Rina Wijaya',
-    specialty: 'Anak',
-    schedule: '09.00 - 13.00',
-    status: true,
-  },
-]);
+  getByDay(daySelected.value).then((res) => {
+    data.value = res.data.value;
+  });
+};
 </script>
