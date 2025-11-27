@@ -26,12 +26,15 @@
 </template>
 
 <script lang="ts" setup>
-const { getCookie, clearAllCookies } = useCookieManager();
+import { useAuth } from '@/composables/api/useAuth';
+
+const { getCookie } = useCookieManager();
 
 const token = getCookie('token');
 const confirm = useConfirm();
 const toast = useToast();
 const router = useRouter();
+const { logOut } = useAuth();
 
 const handleLogout = async () => {
   confirm.require({
@@ -49,7 +52,7 @@ const handleLogout = async () => {
       severity: 'danger',
     },
     accept: () => {
-      clearAllCookies();
+      logOut();
       toast.add({
         severity: 'success',
         summary: 'Berhasil',
