@@ -2,7 +2,7 @@
   <div
     class="flex flex-col bg-primary-light rounded-xl shadow py-6 px-14 w-full items-center gap-10"
   >
-    <div class="flex w-full gap-4 items-start">
+    <div class="flex w-full gap-4 items-start flex-wrap">
       <span
         v-for="(day, index) in days"
         :key="index"
