@@ -13,6 +13,7 @@ export const useApi = () => {
     const data = ref<T | null>(null);
     const error = ref<any>(null);
     const pending = ref<boolean>(true);
+    const { clearAllCookies } = useCookieManager();
 
     try {
       const headers: Record<string, string> = {
@@ -36,7 +37,7 @@ export const useApi = () => {
         headers,
         onRequestError({ response }) {
           if (response?.status === 401) {
-            useCookie('token').value = null;
+            clearAllCookies();
             window.location.href = '/login';
           }
         },
