@@ -48,12 +48,12 @@
 </template>
 
 <script lang="ts" setup>
-import { useUseAuth } from '@/composables/api/useAuth';
+import { useAuth } from '@/composables/api/useAuth';
 
 const loading = ref(false);
 const router = useRouter();
 const toast = useToast();
-const { login } = useUseAuth();
+const { login } = useAuth();
 const { setCookie } = useCookieManager();
 
 const form = ref({
@@ -76,7 +76,7 @@ const handleLogin = async () => {
     };
 
     const response = await login(payload);
-    setCookie('token', response.data.value?.data.token ?? '');
+    setCookie('token', response.data.value?.data.token ?? '', { path: '/' });
     toast.add({
       severity: 'success',
       summary: 'Successful',
