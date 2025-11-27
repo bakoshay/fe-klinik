@@ -9,7 +9,7 @@
     </div>
 
     <div class="flex items-center w-full gap-4">
-      <Icon name="mdi:clock-time-four-outline" size="30" />
+      <Icon name="mdi:clock-time-four-outline" size="30" class="shrink-0" />
       <p class="font-medium">{{ schedule }}</p>
       <span
         :class="[
