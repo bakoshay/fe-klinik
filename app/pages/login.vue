@@ -76,7 +76,7 @@ const handleLogin = async () => {
     };
 
     const response = await login(payload);
-    setCookie('token', response.data.value?.data.token ?? '', { path: '/' });
+    setCookie('token', response.data.value?.data.token ?? '');
     toast.add({
       severity: 'success',
       summary: 'Successful',
