@@ -2,12 +2,13 @@
   <div class="flex items-center justify-center h-[calc(100vh-6rem)] px-6">
     <div
       class="grid gap-6 w-full"
-      :class="{
-        'grid-cols-1 max-w-xs': dataMenu.length === 1,
-        'grid-cols-2 max-w-md': dataMenu.length === 2,
-        'md:grid-cols-3 lg:grid-cols-4 max-w-6xl': dataMenu.length > 2,
-      }"
-      style="place-items: center"
+      :class="[
+        dataMenu.length === 1
+          ? 'grid-cols-1 max-w-xs place-items-center'
+          : dataMenu.length === 2
+          ? 'grid-cols-2 max-w-md place-items-center'
+          : 'md:grid-cols-3 lg:grid-cols-4 max-w-6xl',
+      ]"
     >
       <CardMenu
         v-for="(menu, index) in dataMenu"
