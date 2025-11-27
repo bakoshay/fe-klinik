@@ -1,5 +1,6 @@
 export const useApi = () => {
   const config = useRuntimeConfig();
+  const router = useRouter();
 
   const request = async <T>(
     url: string,
@@ -38,6 +39,7 @@ export const useApi = () => {
         onResponseError({ response }) {
           if (response.status === 401) {
             tokenCookie.value = null;
+            router.push('/login');
           }
         },
       });
@@ -47,6 +49,7 @@ export const useApi = () => {
       // Handle 401 di catch block juga
       if (err?.status === 401 || err?.statusCode === 401 || err?.response?.status === 401) {
         tokenCookie.value = null;
+        router.push('/login');
       }
 
       error.value = err?.data?.message || err?.message || 'Error';
