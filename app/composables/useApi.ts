@@ -13,7 +13,7 @@ export const useApi = () => {
     const data = ref<T | null>(null);
     const error = ref<any>(null);
     const pending = ref<boolean>(true);
-    const { clearAllCookies } = useCookieManager();
+    const tokenCookie = useCookie('token');
 
     try {
       const headers: Record<string, string> = {
@@ -26,7 +26,7 @@ export const useApi = () => {
       };
 
       if (options?.auth) {
-        const token = useCookie('token').value;
+        const token = tokenCookie.value;
         if (token) headers['Authorization'] = `Bearer ${token}`;
       }
 
@@ -35,16 +35,20 @@ export const useApi = () => {
         method: options?.method || 'GET',
         body: options?.body,
         headers,
-        onRequestError({ response }) {
-          if (response?.status === 401) {
-            clearAllCookies();
-            window.location.href = '/login';
+        onResponseError({ response }) {
+          if (response.status === 401) {
+            tokenCookie.value = null;
           }
         },
       });
 
       data.value = result;
     } catch (err: any) {
+      // Handle 401 di catch block juga
+      if (err?.status === 401 || err?.statusCode === 401 || err?.response?.status === 401) {
+        tokenCookie.value = null;
+      }
+
       error.value = err?.data?.message || err?.message || 'Error';
     } finally {
       pending.value = false;
