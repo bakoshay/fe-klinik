@@ -19,7 +19,7 @@
 
     <!-- content -->
     <div class="py-4 px-8 w-full items-center justify-center flex flex-col gap-8">
-      <h1 class="text-6xl font-extrabold">U-01</h1>
+      <h1 class="text-6xl font-extrabold">{{ antrian }}</h1>
       <p class="text-center text-primary-dark">
         Silahkan tunggu, Anda akan dipanggil oleh petugas saat giliran Anda tiba.
       </p>
@@ -30,6 +30,10 @@
 <script setup lang="ts">
 const props = defineProps({
   visible: Boolean,
+  antrian: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits<{
