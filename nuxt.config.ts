@@ -56,6 +56,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:3001',
+      wsBaseUrl: process.env.NUXT_PUBLIC_WS_URL || 'ws://localhost:3001/ws',
     },
   },
 });
