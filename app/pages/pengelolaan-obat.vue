@@ -11,12 +11,18 @@
     </div>
 
     <!-- search bar -->
-    <InputText placeholder="Cari obat..." size="small" class="w-1/3" />
+    <InputText
+      placeholder="Cari obat..."
+      size="small"
+      class="w-1/3"
+      v-model="searchQuery"
+      @keyup.enter="handleSearch"
+    />
 
     <!-- table -->
     <div class="w-full">
       <DataTable
-        :value="obatData"
+        :value="data?.data"
         paginator
         :rows="5"
         show-gridlines
@@ -29,19 +35,19 @@
           </template>
         </Column>
 
-        <Column field="name" header="Nama"></Column>
+        <Column field="nama" header="Nama"></Column>
 
-        <Column field="type_of_drug" header="Jenis Obat">
+        <Column field="jenis" header="Jenis Obat">
           <template #body="{ data }">
-            {{ data.type_of_drug.charAt(0).toUpperCase() + data.type_of_drug.slice(1) }}
+            {{ data.jenis.charAt(0).toUpperCase() + data.jenis.slice(1) }}
           </template>
         </Column>
 
-        <Column field="price" header="Harga">
+        <Column field="harga" header="Harga">
           <template #body="{ data }">
             {{
               new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(
-                data.price
+                data.harga
               )
             }}
           </template>
@@ -50,8 +56,8 @@
         <Column header="Status">
           <template #body="{ data }">
             <Tag
-              :value="data.is_active ? 'Tersedia' : 'Tidak Tersedia'"
-              :severity="data.is_active ? 'success' : 'danger'"
+              :value="data.status ? 'Tersedia' : 'Tidak Tersedia'"
+              :severity="data.status ? 'success' : 'danger'"
             />
           </template>
         </Column>
@@ -62,7 +68,7 @@
               <Button severity="secondary" rounded @click="handleTriggerUpdate(data)">
                 <Icon name="ph:note-pencil-bold" size="16" style="color: green" />
               </Button>
-              <Button severity="secondary" rounded @click="confirmDelete">
+              <Button severity="secondary" rounded @click="confirmDelete(data.id)">
                 <Icon name="ph:trash-bold" size="16" style="color: red" />
               </Button>
             </div>
@@ -72,27 +78,47 @@
     </div>
   </div>
 
-  <FormPengelolaanObat :visible="visible" :data="dataObat" @update:visible="visible = $event" />
+  <FormPengelolaanObat
+    :visible="visible"
+    :data="selectedObat"
+    @update:visible="visible = $event"
+    @saved="fetchObat"
+  />
 </template>
 
 <script lang="ts" setup>
-import type { Obat } from '@/types/obat';
+import { useObat } from '@/composables/api/useObat';
+import type { DataObat } from '@/types/obat';
 
 definePageMeta({
   layout: 'custom',
 });
 
 const visible = ref(false);
-const dataObat = ref<Obat | null>(null);
 const confirm = useConfirm();
 const toast = useToast();
+const searchQuery = ref('');
+const selectedObat = ref<DataObat | null>(null);
 
-const handleTriggerUpdate = (data: Obat) => {
-  dataObat.value = data;
+const { getAll, deleteObat } = useObat();
+const { data } = await useAsyncData('obat', () => getAll('').then((res) => res.data.value));
+
+const handleTriggerUpdate = (data: DataObat) => {
+  selectedObat.value = data;
   visible.value = true;
 };
 
-const confirmDelete = () => {
+const handleSearch = async () => {
+  const res = await getAll(searchQuery.value);
+  data.value = res.data.value;
+};
+
+const fetchObat = async () => {
+  const res = await getAll('');
+  data.value = res.data.value;
+};
+
+const confirmDelete = (id: string) => {
   confirm.require({
     message: 'Apakah Anda yakin ingin menghapus data ini?',
     header: 'Hapus Data',
@@ -107,56 +133,42 @@ const confirmDelete = () => {
       label: 'Hapus',
       severity: 'danger',
     },
-    accept: () => {
-      toast.add({
-        severity: 'success',
-        summary: 'Confirmed',
-        detail: 'Record deleted',
-        life: 3000,
-      });
+    accept: async () => {
+      const response = await deleteObat(id);
+
+      if (response.data.value?.status === true) {
+        fetchObat();
+        toast.add({
+          severity: 'success',
+          summary: 'Sukses',
+          detail: response.data.value?.message,
+          life: 3000,
+        });
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Gagal',
+          detail: response.data.value?.message,
+          life: 3000,
+        });
+      }
     },
   });
 };
 
-// Reset dataDokter saat dialog ditutup untuk mode tambah
-watch(visible, (newVal) => {
-  if (!newVal) {
-    dataObat.value = null;
+watch(searchQuery, async (val) => {
+  if (!val) {
+    const res = await getAll('');
+    data.value = res.data.value;
   }
 });
 
-const obatData = ref<Obat[]>([
-  {
-    name: 'Paracetamol',
-    type_of_drug: 'tablet',
-    price: 5000,
-    is_active: true,
-  },
-  {
-    name: 'Amoxicillin',
-    type_of_drug: 'kapsul',
-    price: 15000,
-    is_active: false,
-  },
-  {
-    name: 'Ibuprofen',
-    type_of_drug: 'kaplet',
-    price: 8000,
-    is_active: true,
-  },
-  {
-    name: 'Cetirizine',
-    type_of_drug: 'tablet',
-    price: 6000,
-    is_active: true,
-  },
-  {
-    name: 'Doxycycline',
-    type_of_drug: 'kapsul',
-    price: 20000,
-    is_active: false,
-  },
-]);
+// Reset dataDokter saat dialog ditutup untuk mode tambah
+watch(visible, (newVal) => {
+  if (!newVal) {
+    selectedObat.value = null;
+  }
+});
 </script>
 
 <style scoped>
