@@ -11,9 +11,13 @@
         <!-- Nomor Antrian Saat Ini -->
         <div class="flex flex-col items-center gap-1">
           <span class="text-gray-500 text-sm">Nomor Antrian Saat Ini</span>
-          <span class="text-6xl font-extrabold text-primary-dark tracking-widest animate-pulse">
+          <span
+            v-if="antrianData?.current?.nomor"
+            class="text-6xl font-extrabold text-primary-dark tracking-widest animate-pulse"
+          >
             {{ antrianData?.current?.nomor }}
           </span>
+          <span v-else class="text-2xl text-gray-400">Tidak ada antrian saat ini</span>
         </div>
         <!-- Daftar Antrian Selanjutnya -->
         <div class="w-full flex flex-col items-start gap-2">
