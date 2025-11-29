@@ -24,7 +24,7 @@
         <label for="name" class="font-semibold text-sm">Nama Obat</label>
         <InputText
           id="name"
-          v-model="form.name"
+          v-model="form.nama"
           type="text"
           fluid
           size="small"
@@ -35,7 +35,7 @@
         <label for="jenisObat" class="font-semibold text-sm">Jenis Obat</label>
         <Select
           id="jenisObat"
-          v-model="form.type_of_drug"
+          v-model="form.jenis"
           fluid
           size="small"
           placeholder="Pilih jenis obat"
@@ -48,7 +48,7 @@
         <label for="harga" class="font-semibold text-sm">Harga</label>
         <InputNumber
           id="harga"
-          v-model="form.price"
+          v-model="form.harga"
           mode="currency"
           currency="IDR"
           locale="id-ID"
@@ -61,7 +61,7 @@
         <label for="status" class="font-semibold text-sm">Status Stock</label>
         <Select
           id="status"
-          v-model="form.is_active"
+          v-model="form.status"
           fluid
           size="small"
           placeholder="Pilih status stock"
@@ -76,25 +76,31 @@
       <!-- Footer -->
       <div class="w-full flex justify-end gap-2 px-6 py-4">
         <BaseButton color="secondary" label="Batal" size="sm" @click="updateVisible(false)" />
-        <BaseButton color="primary-blue" :label="data ? 'Ubah' : 'Simpan'" size="sm" />
+        <BaseButton
+          color="primary-blue"
+          :label="data ? 'Ubah' : 'Simpan'"
+          size="sm"
+          @click="handleSubmit"
+        />
       </div>
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import useHelper from '~/utils/helper';
-import type { Obat } from '~/types/obat';
+import { useObat } from '@/composables/api/useObat';
+import type { DataObat } from '~/types/obat';
 
 const props = defineProps({
   visible: Boolean,
   data: {
-    type: Object as () => Obat | null,
+    type: Object as () => DataObat | null,
     default: null,
   },
 });
 
-const schedule = useHelper().schedule;
+const toast = useToast();
+const { createObat, updateObat } = useObat();
 
 const jenisObatOptions = ref([
   { label: 'Tablet', value: 'tablet' },
@@ -109,6 +115,7 @@ const stockOptions = ref([
 
 const emit = defineEmits<{
   'update:visible': [value: boolean];
+  saved: [];
 }>();
 
 const updateVisible = (value: boolean) => {
@@ -119,31 +126,75 @@ const updateVisible = (value: boolean) => {
 };
 
 const form = ref({
-  name: '',
-  type_of_drug: '' as 'tablet' | 'kapsul' | 'kaplet' | '',
-  price: 0,
-  is_active: true,
+  nama: '',
+  jenis: '' as 'tablet' | 'kapsul' | 'kaplet' | '',
+  harga: 0,
+  status: true,
 });
 
 const resetForm = () => {
   form.value = {
-    name: '',
-    type_of_drug: '' as 'tablet' | 'kapsul' | 'kaplet' | '',
-    price: 0,
-    is_active: true,
+    nama: '',
+    jenis: '' as 'tablet' | 'kapsul' | 'kaplet' | '',
+    harga: 0,
+    status: true,
   };
 };
 
+const handleSubmit = async () => {
+  try {
+    const payload = {
+      nama: form.value.nama,
+      jenis: form.value.jenis,
+      harga: form.value.harga,
+      status: form.value.status,
+    };
+
+    if (props.data) {
+      // update
+      const response = await updateObat(props.data.id, payload);
+      toast.add({
+        severity: 'success',
+        summary: 'Sukses',
+        detail: response.data.value?.message,
+        life: 3000,
+      });
+    } else {
+      // create
+      const response = await createObat(payload);
+
+      toast.add({
+        severity: 'success',
+        summary: 'Sukses',
+        detail: response.data.value?.message,
+        life: 3000,
+      });
+    }
+
+    emit('saved');
+    updateVisible(false);
+  } catch (error) {
+    console.error('Error:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error,
+      life: 3000,
+    });
+
+    updateVisible(false);
+  }
+};
 // Watch untuk detect perubahan data (saat edit)
 watch(
   () => props.data,
   (newData) => {
     if (newData) {
       form.value = {
-        name: newData.name,
-        type_of_drug: newData.type_of_drug,
-        price: newData.price,
-        is_active: newData.is_active,
+        nama: newData.nama,
+        jenis: newData.jenis,
+        harga: newData.harga,
+        status: newData.status,
       };
     } else resetForm();
   },
