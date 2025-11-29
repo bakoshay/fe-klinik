@@ -1,5 +1,5 @@
 <template>
-  <aside class="fixed left-0 top-20 bottom-0 w-64 bg-primary-dark">
+  <aside class="fixed left-0 top-[75px] bottom-0 w-64 bg-primary-dark">
     <nav class="h-full flex flex-col justify-center gap-4 p-4 w-full">
       <NuxtLink
         v-for="(menu, index) in dataMenu"
