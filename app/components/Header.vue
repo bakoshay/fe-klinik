@@ -1,16 +1,22 @@
 <template>
-  <header class="fixed top-0 left-0 right-0 w-full bg-primary px-6 py-4 shadow-md z-50">
+  <header
+    class="fixed top-0 left-0 right-0 w-full bg-primary md:px-6 px-4 md:py-4 py-2 shadow-md z-50"
+  >
     <nav class="flex justify-between items-center w-full">
       <!-- logo -->
       <div class="flex items-center gap-2">
-        <img src="/images/logo.png" alt="Logo" class="size-9" />
-        <h1 class="text-primary-dark font-extrabold text-lg">KLINIK VIRZA MEDIKA</h1>
+        <img src="/images/logo.png" alt="Logo" class="md:size-8 lg:size-9 size-6" />
+        <h1 class="text-primary-dark font-extrabold md:text-base lg:text-lg text-xs">
+          KLINIK VIRZA MEDIKA
+        </h1>
       </div>
 
       <!-- antrian -->
-      <div v-if="token" class="flex items-center gap-1">
-        <div class="flex py-2 px-4 items-center bg-primary-light rounded-lg">
-          <p class="font-bold">{{ antrian ?? '' }}</p>
+      <div v-if="token" class="flex items-center md:gap-1">
+        <div
+          class="flex md:py-1.5 md:px-3 lg:px-4 lg:py-2 py-2 px-2 items-center bg-primary-light rounded-lg shadow-lg"
+        >
+          <p class="font-bold text-xs md:text-base">{{ antrian ?? '' }}</p>
         </div>
 
         <button
@@ -18,7 +24,7 @@
           v-if="data?.status"
           class="flex items-center rounded-lg cursor-pointer hover:shadow-md transition-shadow"
         >
-          <Icon name="lucide:chevron-right" size="25" />
+          <ChevronRightIcon class="size-5 md:size-6 lg:size-7" />
         </button>
       </div>
 
@@ -26,24 +32,27 @@
       <NuxtLink
         v-if="!token"
         to="/login"
-        class="cursor-pointer py-1.5 px-2.5 bg-primary-light rounded-full shadow-md hover:shadow-lg transition-shadow"
+        class="cursor-pointer py-1.5 px-1.5 md:py-2 md:px-2.5 bg-primary-light rounded-full shadow-md hover:shadow-lg transition-shadow"
       >
-        <Icon name="line-md:account" size="28" />
+        <ProfileIcon class="size-5 md:size-6 lg:size-7" />
       </NuxtLink>
 
       <!-- logout -->
       <div
         v-else
-        class="cursor-pointer py-1.5 px-2.5 bg-primary-light rounded-full shadow-md hover:shadow-lg transition-shadow"
+        class="cursor-pointer py-1.5 px-1.5 md:py-2 md:px-2.5 bg-primary-light rounded-full shadow-md hover:shadow-lg transition-shadow"
         @click="handleLogout"
       >
-        <Icon name="line-md:logout" size="28" style="color: red" />
+        <LogoutIcon class="size-5 md:size-6 lg:size-7" />
       </div>
     </nav>
   </header>
 </template>
 
 <script lang="ts" setup>
+import ChevronRightIcon from '@/assets/icons/ChevronRightIcon.vue';
+import ProfileIcon from '@/assets/icons/ProfileIcon.vue';
+import LogoutIcon from '@/assets/icons/LogoutIcon.vue';
 import { useAuth } from '@/composables/api/useAuth';
 import { useAntrian } from '@/composables/api/useAntrian';
 
