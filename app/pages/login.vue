@@ -1,13 +1,19 @@
 <template>
   <div class="min-h-screen flex items-center justify-center">
-    <div class="bg-primary-light rounded-md shadow-md flex w-full max-w-3xl p-2">
+    <div
+      class="bg-primary-light rounded-md shadow-md flex flex-col md:flex-row max-w-72 lg:w-full md:max-w-3xl p-2"
+    >
       <!-- Gambar kiri -->
-      <img src="/images/login-banner.jpg" alt="auth-banner" class="h-[500px] w-1/2 object-cover" />
+      <img
+        src="/images/login-banner.jpg"
+        alt="auth-banner"
+        class="lg:h-[500px] md:h-[400px] w-1/2 object-cover hidden md:block"
+      />
       <!-- Form kanan -->
-      <div class="flex flex-col justify-center items-center flex-1 p-8 w-full gap-6">
+      <div class="flex flex-col justify-center items-center flex-1 p-2 md:p-8 w-full gap-6">
         <div class="flex flex-col items-center justify-center gap-1 w-full">
-          <img src="/images/logo.png" alt="logo" class="w-20" />
-          <h2 class="font-bold text-2xl text-center">KLINIK VIRZA MEDIKA</h2>
+          <img src="/images/logo.png" alt="logo" class="md:w-20 w-16" />
+          <h2 class="font-bold md:text-2xl text-xl text-center">KLINIK VIRZA MEDIKA</h2>
         </div>
         <form class="w-full items-start flex flex-col gap-3" @submit.prevent="handleLogin">
           <div class="flex flex-col items-start w-full gap-1">
