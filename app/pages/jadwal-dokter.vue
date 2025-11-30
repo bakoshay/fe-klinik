@@ -1,8 +1,9 @@
 <template>
   <div
-    class="flex flex-col bg-primary-light rounded-xl shadow py-6 px-14 w-full items-center gap-10"
+    class="flex flex-col bg-primary-light rounded-xl shadow py-4 px-4 lg:py-6 lg:px-6 w-full items-center gap-6"
   >
-    <div class="flex w-full gap-4 items-start flex-wrap">
+    <!-- Desktop: Tampilan Badge Seperti Sebelumnya -->
+    <div class="hidden lg:flex w-full gap-4 items-start flex-wrap">
       <span
         v-for="(day, index) in days"
         :key="index"
@@ -17,11 +18,25 @@
       >
     </div>
 
-    <h2 v-if="!data?.data.length" class="font-bold text-primary-dark text-xl">
+    <!-- Mobile & Tablet: Dropdown Select -->
+    <div class="lg:hidden w-full">
+      <Dropdown
+        v-model="daySelected"
+        :options="days"
+        optionLabel="label"
+        size="small"
+        optionValue="value"
+        @change="onDayChange(daySelected)"
+        placeholder="Pilih Hari"
+        class="w-full"
+      />
+    </div>
+
+    <h2 v-if="!data?.data.length" class="font-bold text-primary-dark lg:text-xl text-center">
       {{ `Tidak Ada Jadwal Dokter Pada Hari ${useHelper().capitalizeFirst(daySelected)}` }}
     </h2>
 
-    <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 w-full">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
       <CardJadwalDokter
         v-for="(docter, index) in data?.data"
         :key="index"
