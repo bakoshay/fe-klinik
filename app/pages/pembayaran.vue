@@ -2,15 +2,15 @@
   <div class="w-full flex flex-col gap-4 items-start">
     <!-- Header -->
     <div class="bg-primary-light rounded-2xl shadow-xl p-4 w-full">
-      <h1 class="text-2xl font-bold">Pembayaran</h1>
+      <h1 class="text-xl md:text-2xl font-bold">Pembayaran</h1>
     </div>
 
     <div class="grid lg:grid-cols-3 gap-4 w-full">
       <!-- Daftar Obat -->
       <div
-        class="lg:col-span-2 w-full flex flex-col gap-2 p-6 rounded-2xl bg-primary-light shadow-xl"
+        class="lg:col-span-2 w-full flex flex-col gap-2 p-4 md:p-6 rounded-2xl bg-primary-light shadow-xl"
       >
-        <h2 class="text-xl font-bold">Daftar Obat</h2>
+        <h2 class="text-lg md:text-xl font-bold">Daftar Obat</h2>
 
         <!-- Search -->
         <InputText
@@ -21,54 +21,55 @@
           @keyup.enter="handleSearch"
         />
 
-        <!-- DataTable -->
-        <DataTable
-          :value="Array.isArray(data?.data) ? data.data : []"
-          paginator
-          :rows="10"
-          stripedRows
-          scrollable
-        >
-          <Column field="nama" header="Nama Obat" sortable></Column>
-          <Column field="jenis" header="Jenis Obat">
-            <template #body="{ data }">
-              {{ data.jenis.charAt(0).toUpperCase() + data.jenis.slice(1) }}
-            </template>
-          </Column>
-          <Column field="harga" header="Harga">
-            <template #body="{ data }">
-              {{
-                new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(
-                  data.harga
-                )
-              }}
-            </template>
-          </Column>
-          <Column header="Aksi">
-            <template #body="slotProps">
-              <Button
-                icon="pi pi-plus"
-                size="small"
-                @click="handleAddToCart(slotProps.data)"
-                :disabled="slotProps.data.stok === 0"
-              />
-            </template>
-          </Column>
-        </DataTable>
+        <!-- DataTable Desktop -->
+        <div class="w-full">
+          <DataTable
+            :value="Array.isArray(data?.data) ? data.data : []"
+            paginator
+            :rows="10"
+            scrollable
+          >
+            <Column field="nama" header="Nama Obat" sortable></Column>
+            <Column field="jenis" header="Jenis Obat">
+              <template #body="{ data }">
+                {{ data.jenis.charAt(0).toUpperCase() + data.jenis.slice(1) }}
+              </template>
+            </Column>
+            <Column field="harga" header="Harga">
+              <template #body="{ data }">
+                {{
+                  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(
+                    data.harga
+                  )
+                }}
+              </template>
+            </Column>
+            <Column header="Aksi">
+              <template #body="slotProps">
+                <Button
+                  icon="pi pi-plus"
+                  size="small"
+                  @click="handleAddToCart(slotProps.data)"
+                  :disabled="slotProps.data.stok === 0"
+                />
+              </template>
+            </Column>
+          </DataTable>
+        </div>
       </div>
 
       <!-- Keranjang & Summary -->
       <div
-        class="lg:col-span-1 rounded-2xl shadow-xl p-6 bg-primary-light flex flex-col gap-4 w-full items-start"
+        class="lg:col-span-1 rounded-2xl shadow-xl p-4 md:p-6 bg-primary-light flex flex-col gap-4 w-full items-start lg:sticky lg:top-4 lg:h-fit"
       >
         <div class="flex items-center gap-2">
-          <ShopingCartIcon class="size-6" />
-          <h2 class="text-xl font-bold">Keranjang</h2>
+          <ShopingCartIcon class="size-5 md:size-6" />
+          <h2 class="text-lg md:text-xl font-bold">Keranjang</h2>
         </div>
 
         <!-- Nomor Urut -->
         <div class="flex flex-col items-start w-full gap-1">
-          <label for="nomorurut" class="font-semibold text-sm">Nomor Urut</label>
+          <label for="nomorurut" class="font-semibold text-xs md:text-sm">Nomor Urut</label>
           <Select
             id="nomorurut"
             v-model="noUrut"
@@ -83,7 +84,7 @@
 
         <!-- Nama Pasien -->
         <div v-if="namaPasien" class="flex flex-col items-start w-full gap-1">
-          <label for="nama" class="text-sm font-medium">Nama Pasien</label>
+          <label for="nama" class="text-xs md:text-sm font-medium">Nama Pasien</label>
           <InputText
             id="nama"
             placeholder="Masukkan nama pasien"
@@ -96,7 +97,7 @@
 
         <!-- Biaya Layanan -->
         <div class="flex flex-col items-start w-full gap-1">
-          <label for="biayalayanan" class="text-sm font-medium">Biaya Layanan</label>
+          <label for="biayalayanan" class="text-xs md:text-sm font-medium">Biaya Layanan</label>
           <InputNumber
             id="biayalayanan"
             mode="currency"
@@ -111,7 +112,9 @@
 
         <!-- Jenis Pembayaran -->
         <div class="flex flex-col items-start w-full gap-1">
-          <label for="jenispembayaran" class="text-sm font-medium">Jenis Pembayaran</label>
+          <label for="jenispembayaran" class="text-xs md:text-sm font-medium"
+            >Jenis Pembayaran</label
+          >
           <Select
             size="small"
             :options="jenisPembayaranOption"
@@ -125,7 +128,9 @@
 
         <!-- Nominal Pembayaran -->
         <div v-if="jenisPembayaran === 'cash'" class="flex flex-col items-start w-full gap-1">
-          <label for="nominalpembayaran" class="text-sm font-medium">Nominal Pembayaran</label>
+          <label for="nominalpembayaran" class="text-xs md:text-sm font-medium"
+            >Nominal Pembayaran</label
+          >
           <InputNumber
             id="nominalpembayaran"
             mode="currency"
@@ -139,22 +144,23 @@
         </div>
 
         <!-- Item List -->
-        <div class="max-h-64 overflow-y-auto w-full flex flex-col items-start gap-2">
+        <div class="max-h-48 md:max-h-64 overflow-y-auto w-full flex flex-col items-start gap-2">
           <div v-if="selectedItems.length === 0" class="text-center text-gray-400 py-8 w-full">
-            Keranjang kosong
+            <Icon name="lucide:shopping-cart" class="size-8 md:size-12 mx-auto mb-2 opacity-50" />
+            <p class="text-xs md:text-sm">Keranjang kosong</p>
           </div>
 
           <div
             v-for="item in selectedItems"
             :key="item.id"
-            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg w-full"
+            class="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg w-full"
           >
-            <div class="flex-1">
-              <p class="font-medium text-sm">{{ item.nama }}</p>
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-xs md:text-sm truncate">{{ item.nama }}</p>
               <p class="text-xs text-gray-600">Rp {{ item.harga.toLocaleString('id-ID') }}</p>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 md:gap-2 hrink-0">
               <Button
                 icon="pi pi-minus"
                 size="small"
@@ -162,7 +168,9 @@
                 text
                 @click="updateQuantity(item.id, -1)"
               />
-              <span class="w-8 text-center font-medium">{{ item.qty }}</span>
+              <span class="w-6 md:w-8 text-center font-medium text-xs md:text-sm">{{
+                item.qty
+              }}</span>
               <Button
                 icon="pi pi-plus"
                 size="small"
@@ -176,28 +184,32 @@
                 severity="danger"
                 text
                 @click="removeItem(item.id)"
+                class="ml-1"
               />
             </div>
           </div>
         </div>
 
         <!-- Summary -->
-        <div class="border-t pt-4 flex flex-col w-full gap-2">
-          <div class="flex justify-between text-sm">
+        <div class="border-t pt-3 md:pt-4 flex flex-col w-full gap-2">
+          <div class="flex justify-between text-xs md:text-sm">
             <span>Subtotal Obat:</span>
             <span class="font-medium">Rp {{ subtotal.toLocaleString('id-ID') }}</span>
           </div>
-          <div class="flex justify-between text-sm">
+          <div class="flex justify-between text-xs md:text-sm">
             <span>Biaya Layanan:</span>
             <span class="font-medium">Rp {{ biayaLayanan.toLocaleString('id-ID') }}</span>
           </div>
-          <div class="flex justify-between text-lg font-bold border-t pt-2">
+          <div class="flex justify-between text-base md:text-lg font-bold border-t pt-2">
             <span>Total:</span>
             <span class="text-primary-blue">Rp {{ total.toLocaleString('id-ID') }}</span>
           </div>
-          <div v-if="jenisPembayaran === 'cash'" class="flex justify-between text-lg font-bold">
+          <div
+            v-if="jenisPembayaran === 'cash'"
+            class="flex justify-between text-base md:text-lg font-bold"
+          >
             <span>Kembalian:</span>
-            <span class="text-primary-blue">Rp {{ kembalian.toLocaleString('id-ID') }}</span>
+            <span class="text-green-600">Rp {{ kembalian.toLocaleString('id-ID') }}</span>
           </div>
         </div>
 
@@ -211,18 +223,18 @@
             @click="handleSubmit"
           >
             <template #default>
-              <span v-if="loading" class="flex items-center gap-2">
-                <Icon class="animate-spin h-5 w-5 inline" name="lucide:loader" />
-                Loading...
+              <span v-if="loading" class="flex items-center gap-2 justify-center">
+                <Icon class="animate-spin h-4 w-4 md:h-5 md:w-5 inline" name="lucide:loader" />
+                <span class="text-xs md:text-sm">Loading...</span>
               </span>
-              <span v-else>Proses Pembayaran</span>
+              <span v-else class="text-xs md:text-sm">Proses Pembayaran</span>
             </template>
           </BaseButton>
           <BaseButton
             color="danger"
             variant="ghost"
             size="sm"
-            class="w-full"
+            class="w-full text-xs md:text-sm"
             @click="resetCart"
             label="Reset Keranjang"
           />
