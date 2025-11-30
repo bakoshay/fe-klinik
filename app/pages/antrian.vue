@@ -86,6 +86,7 @@ const antrian = ref<string>('');
 const loading = ref(false);
 const toast = useToast();
 const { createAntrian } = useAntrian();
+const { printPDFAntrian, printBluetoothAntrian } = usePrint();
 
 const form = ref({
   nama: '',
@@ -117,11 +118,18 @@ const handleSubmit = async () => {
     const response = await createAntrian(payload);
     antrian.value = response.data.value?.data.nomor || '';
 
+    printBluetoothAntrian({
+      nomor: antrian.value,
+      pasien: form.value.nama,
+    });
+
     visible.value = true;
+    resetForm();
+
+    // setelah beberapa saat, tutup popup antrian
     setTimeout(() => {
       visible.value = false;
     }, 5000);
-    resetForm();
   } catch (error) {
     toast.add({
       severity: 'error',
