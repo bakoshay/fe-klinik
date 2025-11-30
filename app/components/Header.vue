@@ -21,7 +21,6 @@
 
         <button
           @click="handleNextAntrian"
-          v-if="data?.status"
           class="flex items-center rounded-lg cursor-pointer hover:shadow-md transition-shadow"
         >
           <ChevronRightIcon class="size-5 md:size-6 lg:size-7" />
@@ -77,8 +76,10 @@ if (data.value?.status) {
 
 const handleNextAntrian = async () => {
   const response = await nextAntrian();
-  if (response.data.value?.status) {
-    antrian.value = response.data.value?.data?.nomor || '';
+  if (response.data.value?.status && response.data.value?.data) {
+    antrian.value = response.data.value.data.nomor || '';
+  } else {
+    antrian.value = 'Belum Ada Antrian';
   }
 };
 
