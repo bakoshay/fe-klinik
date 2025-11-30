@@ -39,9 +39,18 @@ export default function useHelper() {
     return `${hours}:${minutes}`;
   };
 
+  const formatMoney = (value: number | string) => {
+    const n = typeof value === 'string' ? Number(value) : value;
+    if (!Number.isFinite(n)) return '0';
+    return new Intl.NumberFormat('id-ID', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(n);
+  };
+
   const capitalizeFirst = (str: string) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  return { days, jenisKelamin, parseTime, formatTime, schedule, capitalizeFirst };
+  return { days, jenisKelamin, parseTime, formatTime, formatMoney, schedule, capitalizeFirst };
 }
