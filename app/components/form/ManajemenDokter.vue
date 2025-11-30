@@ -4,22 +4,25 @@
     @update:visible="updateVisible"
     position="center"
     :modal="true"
+    :breakpoints="{ '960px': '75vw', '640px': '95vw' }"
     :style="{ width: '40rem' }"
     :pt="{
       header: { class: '!p-0' },
-      content: { class: '!p-0' },
+      content: { class: '!p-0 max-h-[70vh] overflow-y-auto' },
       footer: { class: '!p-0' },
     }"
   >
     <template #header>
       <!-- Header -->
-      <div class="py-4 px-6 w-full items-start">
-        <p class="text-lg font-bold">{{ data ? 'Edit Data Dokter' : 'Tambah Data Dokter' }}</p>
+      <div class="py-4 px-4 md:px-6 w-full items-start">
+        <p class="text-base md:text-lg font-bold">
+          {{ data ? 'Edit Data Dokter' : 'Tambah Data Dokter' }}
+        </p>
       </div>
     </template>
 
     <!-- content -->
-    <div class="px-6 w-full items-start flex flex-col gap-4">
+    <div class="px-4 md:px-6 w-full items-start flex flex-col gap-4 pb-4">
       <div class="flex flex-col items-start w-full gap-1">
         <label for="name" class="font-semibold text-sm">Nama Dokter</label>
         <InputText
@@ -31,6 +34,7 @@
           placeholder="Masukan nama dokter"
         />
       </div>
+
       <div class="flex flex-col items-start w-full gap-2">
         <label for="jeniskelamin" class="font-semibold text-sm">Jenis Kelamin</label>
         <Select
@@ -44,10 +48,12 @@
           option-value="value"
         />
       </div>
+
       <div class="flex flex-col items-start w-full gap-2">
         <label for="alamat" class="font-semibold text-sm">Alamat</label>
         <Textarea id="alamat" v-model="form.address" fluid placeholder="Masukan alamat" />
       </div>
+
       <div class="flex flex-col items-start w-full gap-2">
         <label for="nohp" class="font-semibold text-sm">No HP</label>
         <InputText
@@ -59,19 +65,43 @@
           placeholder="Masukan No HP"
         />
       </div>
+
       <div class="flex flex-col items-start w-full gap-2">
         <p class="font-semibold text-sm">Jadwal Praktek</p>
-        <div class="grid gap-4 w-full">
-          <div v-for="(item, i) in schedule" :key="i" class="flex items-center gap-4">
-            <Checkbox v-model="item.selected" :binary="true" />
+        <div class="grid gap-3 w-full">
+          <div
+            v-for="(item, i) in schedule"
+            :key="i"
+            class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
+          >
+            <!-- Checkbox + Day -->
+            <div class="flex items-center gap-3 sm:w-32">
+              <Checkbox v-model="item.selected" :binary="true" />
+              <span class="capitalize text-sm font-medium">{{ item.day }}</span>
+            </div>
 
-            <span class="w-24 capitalize">{{ item.day }}</span>
-
-            <InputText type="time" v-model="item.start" :disabled="!item.selected" />
-            <InputText type="time" v-model="item.end" :disabled="!item.selected" />
+            <!-- Time Inputs -->
+            <div class="flex items-center gap-2 flex-1 ml-7 sm:ml-0">
+              <InputText
+                type="time"
+                v-model="item.start"
+                :disabled="!item.selected"
+                class="flex-1 text-sm"
+                size="small"
+              />
+              <span class="text-gray-400 text-xs">-</span>
+              <InputText
+                type="time"
+                v-model="item.end"
+                :disabled="!item.selected"
+                class="flex-1 text-sm"
+                size="small"
+              />
+            </div>
           </div>
         </div>
       </div>
+
       <div class="flex flex-col items-start w-full gap-2">
         <label for="status" class="font-semibold text-sm">Status</label>
         <Select
@@ -89,7 +119,7 @@
 
     <template #footer>
       <!-- Footer -->
-      <div class="w-full flex justify-end gap-2 px-6 py-4">
+      <div class="w-full flex justify-end gap-2 px-4 md:px-6 py-4">
         <BaseButton color="secondary" label="Batal" size="sm" @click="updateVisible(false)" />
         <BaseButton
           color="primary-blue"

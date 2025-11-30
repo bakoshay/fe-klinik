@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-4 items-start w-full bg-primary-light p-4 rounded-xl">
     <div class="flex items-center justify-between w-full border-b pb-4 border-gray-300">
-      <h1 class="font-bold text-xl">Manajemen Dokter</h1>
+      <h1 class="font-bold text-lg md:text-xl">Manajemen Dokter</h1>
 
       <BaseButton @click="visible = true" label="Tambah" size="sm" color="secondary">
         <template #icon-left>
@@ -14,7 +14,7 @@
     <InputText
       placeholder="Cari dokter..."
       size="small"
-      class="w-1/3"
+      class="w-full lg:w-1/2 xl:w-1/3"
       v-model="searchQuery"
       @keyup.enter="handleSearch"
     />
