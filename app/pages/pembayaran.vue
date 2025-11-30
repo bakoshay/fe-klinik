@@ -25,7 +25,7 @@
         <DataTable
           :value="Array.isArray(data?.data) ? data.data : []"
           paginator
-          :rows="5"
+          :rows="10"
           stripedRows
           scrollable
         >
@@ -207,9 +207,17 @@
             color="primary-blue"
             size="sm"
             class="w-full"
+            :disabled="loading"
             @click="handleSubmit"
-            label="Proses Pembayaran"
-          />
+          >
+            <template #default>
+              <span v-if="loading" class="flex items-center gap-2">
+                <Icon class="animate-spin h-5 w-5 inline" name="lucide:loader" />
+                Loading...
+              </span>
+              <span v-else>Proses Pembayaran</span>
+            </template>
+          </BaseButton>
           <BaseButton
             color="danger"
             variant="ghost"
@@ -222,33 +230,50 @@
       </div>
     </div>
   </div>
+
+  <PopupStruck
+    :visible="visible"
+    @update:visible="
+      (val) => {
+        visible = val;
+        if (!val) resetAll();
+      }
+    "
+    :data="dataStruk"
+  />
 </template>
 
 <script lang="ts" setup>
 import ShopingCartIcon from '@/assets/icons/ShopingCartIcon.vue';
 import { useObat } from '@/composables/api/useObat';
+import { usePembayaran } from '@/composables/api/usePembayaran';
 import { useAntrian } from '@/composables/api/useAntrian';
+import type { Pembayaran } from '@/types/pembayaran';
 
 definePageMeta({
   layout: 'custom',
 });
 
+const visible = ref(false);
 const searchQuery = ref('');
 const noUrut = ref('');
 const namaPasien = ref('');
 const biayaLayanan = ref(50000);
 const jenisPembayaran = ref('');
 const nominalPembayaran = ref(0);
+const dataStruk = ref<Pembayaran | null>(null);
+const toast = useToast();
+const loading = ref(false);
 
 const { getByAvailable } = useObat();
 const { getAntrianByCurrentDay } = useAntrian();
 const { data } = await useAsyncData('obat-available', () =>
   getByAvailable('').then((res) => res.data.value)
 );
-
 const antrian = await useAsyncData('antrian-today', () =>
   getAntrianByCurrentDay().then((res) => res.data.value)
 );
+const { createPembayaran } = usePembayaran();
 
 const {
   selectedItems,
@@ -271,36 +296,69 @@ const jenisPembayaranOption = ref([
   { label: 'Qris', value: 'qris' },
 ]);
 
+const resetAll = () => {
+  resetCart();
+  noUrut.value = '';
+  namaPasien.value = '';
+  jenisPembayaran.value = '';
+  nominalPembayaran.value = 0;
+  dataStruk.value = null;
+};
+
 // Submit
-const handleSubmit = () => {
-  let jumlahBayar: number | null = null;
+const handleSubmit = async () => {
+  let jumlahBayar: number = 0;
   if (jenisPembayaran.value === 'cash') {
     jumlahBayar = Number(nominalPembayaran.value);
   } else if (jenisPembayaran.value === 'qris') {
     jumlahBayar = total.value;
   }
 
-  const payload = {
-    pasien: namaPasien.value,
-    biaya_layanan: biayaLayanan.value,
-    jumlah_bayar: jumlahBayar,
-    kembalian:
-      jenisPembayaran.value === 'cash'
-        ? Math.max(0, Number(nominalPembayaran.value) - total.value)
-        : null,
-    metode: jenisPembayaran.value,
-    total: total.value,
-    obat: selectedItems.value.map((item) => ({
-      id: item.id,
-      nama: item.nama,
-      harga: item.harga,
-      qty: item.qty,
-      total: item.harga * item.qty,
-    })),
-  };
+  loading.value = true;
+  try {
+    const payload = {
+      pasien: namaPasien.value,
+      biaya_layanan: biayaLayanan.value,
+      jumlah_bayar: jumlahBayar,
+      ...(jenisPembayaran.value === 'cash' && {
+        kembalian: Math.max(0, Number(nominalPembayaran.value) - total.value),
+      }),
+      metode: jenisPembayaran.value,
+      sub_total: subtotal.value,
+      total: total.value,
+      obat: selectedItems.value.map((item) => ({
+        id: item.id,
+        nama: item.nama,
+        harga: item.harga,
+        qty: item.qty,
+        total: item.harga * item.qty,
+      })),
+    };
 
-  console.log('Payload:', payload);
-  alert('Pembayaran berhasil! Cek console untuk detail.');
+    const response = await createPembayaran(payload);
+
+    toast.add({
+      severity: 'success',
+      summary: 'Sukses',
+      detail: response.data.value?.message,
+      life: 3000,
+    });
+
+    if (response.data.value?.status) {
+      dataStruk.value = payload;
+      visible.value = true;
+    }
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Gagal',
+      detail:
+        error instanceof Error ? error.message : 'Terjadi kesalahan saat memproses pembayaran.',
+      life: 3000,
+    });
+  } finally {
+    loading.value = false;
+  }
 };
 
 watch(searchQuery, async (val) => {
