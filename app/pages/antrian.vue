@@ -1,16 +1,16 @@
 <template>
-  <div class="flex flex-col items-start w-full gap-4">
-    <h1 class="text-3xl font-bold">Antrian Online</h1>
+  <div class="flex flex-col items-start w-full gap-2 md:gap-4">
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold">Antrian Online</h1>
 
     <form
-      class="flex flex-col bg-primary-light rounded-xl shadow py-6 w-full items-center gap-8 px-40"
+      class="flex flex-col bg-primary-light rounded-xl shadow py-6 w-full items-center gap-4 md:gap-8 px-4 md:px-12 lg:px-28 xl:px-40"
       @submit.prevent="handleSubmit"
     >
-      <h1 class="font-bold text-xl">Formulir Antrian</h1>
+      <h1 class="font-bold md:text-lg lg:text-xl">Formulir Antrian</h1>
 
       <div class="flex flex-col items-center w-full gap-3">
-        <div class="flex flex-col items-start w-full gap-2">
-          <label for="name" class="font-semibold text-sm">Nama Lengkap</label>
+        <div class="flex flex-col items-start w-full gap-1 md:gap-2">
+          <label for="name" class="font-semibold text-xs md:text-sm">Nama Lengkap</label>
           <InputText
             id="name"
             type="text"
@@ -20,8 +20,8 @@
             v-model="form.nama"
           />
         </div>
-        <div class="flex flex-col items-start w-full gap-2">
-          <label for="nik" class="font-semibold text-sm">NIK</label>
+        <div class="flex flex-col items-start w-full gap-1 md:gap-2">
+          <label for="nik" class="font-semibold text-xs md:text-sm">NIK</label>
           <InputText
             id="nik"
             type="text"
@@ -31,8 +31,8 @@
             v-model="form.nik"
           />
         </div>
-        <div class="flex flex-col items-start w-full gap-2">
-          <label for="jeniskelamin" class="font-semibold text-sm">Jenis Kelamin</label>
+        <div class="flex flex-col items-start w-full gap-1 md:gap-2">
+          <label for="jeniskelamin" class="font-semibold text-xs md:text-sm">Jenis Kelamin</label>
           <Select
             id="jeniskelamin"
             fluid
@@ -44,8 +44,8 @@
             v-model="form.jenis_kelamin"
           />
         </div>
-        <div class="flex flex-col items-start w-full gap-2">
-          <label for="keluhan" class="font-semibold text-sm">Keluhan Singkat</label>
+        <div class="flex flex-col items-start w-full gap-1 md:gap-2">
+          <label for="keluhan" class="font-semibold text-xs md:text-sm">Keluhan Singkat</label>
           <Textarea id="keluhan" fluid v-model="form.keluhan" />
         </div>
       </div>
