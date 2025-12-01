@@ -20,6 +20,7 @@
         </div>
 
         <button
+          v-if="data?.data"
           @click="handleNextAntrian"
           class="flex items-center rounded-lg cursor-pointer hover:shadow-md transition-shadow"
         >
