@@ -5,10 +5,10 @@
       <h1 class="text-xl md:text-2xl font-bold">Pembayaran</h1>
     </div>
 
-    <div class="grid lg:grid-cols-3 gap-4 w-full">
+    <div class="flex flex-col lg:grid lg:grid-cols-3 gap-4 w-full">
       <!-- Daftar Obat -->
       <div
-        class="lg:col-span-2 w-full flex flex-col gap-2 p-4 md:p-6 rounded-2xl bg-primary-light shadow-xl"
+        class="w-full lg:col-span-2 flex flex-col gap-2 p-4 md:p-6 rounded-2xl bg-primary-light shadow-xl"
       >
         <h2 class="text-lg md:text-xl font-bold">Daftar Obat</h2>
 
@@ -22,7 +22,7 @@
         />
 
         <!-- DataTable Desktop -->
-        <div class="w-full">
+        <div class="w-full overflow-x-auto">
           <DataTable
             :value="Array.isArray(data?.data) ? data.data : []"
             paginator
@@ -67,7 +67,6 @@
           <h2 class="text-lg md:text-xl font-bold">Keranjang</h2>
         </div>
 
-        <!-- Nomor Urut -->
         <div class="flex flex-col items-start w-full gap-1">
           <label for="nomorurut" class="font-semibold text-xs md:text-sm">Nomor Urut</label>
           <Select
@@ -82,7 +81,6 @@
           />
         </div>
 
-        <!-- Nama Pasien -->
         <div v-if="namaPasien" class="flex flex-col items-start w-full gap-1">
           <label for="nama" class="text-xs md:text-sm font-medium">Nama Pasien</label>
           <InputText
@@ -95,7 +93,6 @@
           />
         </div>
 
-        <!-- Biaya Layanan -->
         <div class="flex flex-col items-start w-full gap-1">
           <label for="biayalayanan" class="text-xs md:text-sm font-medium">Biaya Layanan</label>
           <InputNumber
@@ -110,7 +107,6 @@
           />
         </div>
 
-        <!-- Jenis Pembayaran -->
         <div class="flex flex-col items-start w-full gap-1">
           <label for="jenispembayaran" class="text-xs md:text-sm font-medium"
             >Jenis Pembayaran</label
@@ -126,7 +122,6 @@
           />
         </div>
 
-        <!-- Nominal Pembayaran -->
         <div v-if="jenisPembayaran === 'cash'" class="flex flex-col items-start w-full gap-1">
           <label for="nominalpembayaran" class="text-xs md:text-sm font-medium"
             >Nominal Pembayaran</label
@@ -143,7 +138,6 @@
           />
         </div>
 
-        <!-- Item List -->
         <div class="max-h-48 md:max-h-64 overflow-y-auto w-full flex flex-col items-start gap-2">
           <div v-if="selectedItems.length === 0" class="text-center text-gray-400 py-8 w-full">
             <Icon name="lucide:shopping-cart" class="size-8 md:size-12 mx-auto mb-2 opacity-50" />
@@ -190,7 +184,6 @@
           </div>
         </div>
 
-        <!-- Summary -->
         <div class="border-t pt-3 md:pt-4 flex flex-col w-full gap-2">
           <div class="flex justify-between text-xs md:text-sm">
             <span>Subtotal Obat:</span>
@@ -213,7 +206,6 @@
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="flex flex-col w-full gap-2">
           <BaseButton
             color="primary-blue"
