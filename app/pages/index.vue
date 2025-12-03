@@ -1,13 +1,13 @@
 <template>
   <div class="flex items-center justify-center md:h-[calc(100vh-6rem)] px-6">
     <div
-      class="grid gap-6 w-full pb-4 md:pb-0"
+      class="grid gap-6 w-full pb-4 md:pb-0 max-w-6xl"
       :class="[
         dataMenu.length === 1
-          ? 'grid-cols-1 max-w-xs place-items-center'
+          ? 'grid-cols-1 place-items-center'
           : dataMenu.length === 2
-          ? 'md:grid-cols-2 grid-cols-1 max-w-md place-items-center'
-          : 'md:grid-cols-3 lg:grid-cols-4 max-w-6xl',
+          ? 'grid-cols-1 md:grid-cols-2'
+          : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4',
       ]"
     >
       <CardMenu
