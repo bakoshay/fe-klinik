@@ -24,7 +24,9 @@
     <!-- content -->
     <div class="px-4 md:px-6 w-full items-start flex flex-col gap-4 pb-4">
       <div class="flex flex-col items-start w-full gap-1">
-        <label for="name" class="font-semibold text-sm">Nama Dokter</label>
+        <label for="name" class="font-semibold text-sm"
+          >Nama Dokter<span class="text-red-500">*</span></label
+        >
         <InputText
           id="name"
           v-model="form.name"
@@ -32,11 +34,19 @@
           fluid
           size="small"
           placeholder="Masukan nama dokter"
+          :class="{ 'p-invalid': validation.hasError('name') }"
+          @blur="validation.touch('name')"
+          @input="validation.validate('name', form.name)"
         />
+        <small v-if="validation.getError('name')" class="text-red-500">
+          {{ validation.getError('name') }}
+        </small>
       </div>
 
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="jeniskelamin" class="font-semibold text-sm">Jenis Kelamin</label>
+        <label for="jeniskelamin" class="font-semibold text-sm"
+          >Jenis Kelamin<span class="text-red-500">*</span></label
+        >
         <Select
           id="jeniskelamin"
           v-model="form.gender"
@@ -46,16 +56,37 @@
           :options="jenisKelaminOptions"
           option-label="label"
           option-value="value"
+          :class="{ 'p-invalid': validation.hasError('gender') }"
+          @blur="validation.touch('gender')"
+          @change="validation.validate('gender', form.gender)"
         />
+        <small v-if="validation.getError('gender')" class="text-red-500">
+          {{ validation.getError('gender') }}
+        </small>
       </div>
 
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="alamat" class="font-semibold text-sm">Alamat</label>
-        <Textarea id="alamat" v-model="form.address" fluid placeholder="Masukan alamat" />
+        <label for="alamat" class="font-semibold text-sm"
+          >Alamat<span class="text-red-500">*</span></label
+        >
+        <Textarea
+          id="alamat"
+          v-model="form.address"
+          fluid
+          placeholder="Masukan alamat"
+          :class="{ 'p-invalid': validation.hasError('address') }"
+          @blur="validation.touch('address')"
+          @input="validation.validate('address', form.address)"
+        />
+        <small v-if="validation.getError('address')" class="text-red-500">
+          {{ validation.getError('address') }}
+        </small>
       </div>
 
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="nohp" class="font-semibold text-sm">No HP</label>
+        <label for="nohp" class="font-semibold text-sm"
+          >No HP<span class="text-red-500">*</span></label
+        >
         <InputText
           id="nohp"
           v-model="form.phone"
@@ -63,11 +94,17 @@
           fluid
           size="small"
           placeholder="Masukan No HP"
+          :class="{ 'p-invalid': validation.hasError('phone') }"
+          @blur="validation.touch('phone')"
+          @input="validation.validate('phone', form.phone)"
         />
+        <small v-if="validation.getError('phone')" class="text-red-500">
+          {{ validation.getError('phone') }}
+        </small>
       </div>
 
       <div class="flex flex-col items-start w-full gap-2">
-        <p class="font-semibold text-sm">Jadwal Praktek</p>
+        <p class="font-semibold text-sm">Jadwal Praktek<span class="text-red-500">*</span></p>
         <div class="grid gap-3 w-full">
           <div
             v-for="(item, i) in schedule"
@@ -135,6 +172,7 @@
 <script setup lang="ts">
 import useHelper from '~/utils/helper';
 import { useDokter } from '@/composables/api/useDokter';
+import { dokterValidation } from '@/validations';
 import type { Dokter } from '~/types/dokter';
 
 const props = defineProps({
@@ -148,6 +186,7 @@ const props = defineProps({
 const jenisKelaminOptions = useHelper().jenisKelamin;
 const schedule = useHelper().schedule;
 const toast = useToast();
+const validation = useValidation(dokterValidation);
 const { createDokter, updateDokter } = useDokter();
 
 const statusOptions = ref([
@@ -192,9 +231,32 @@ const resetForm = () => {
     start: null,
     end: null,
   }));
+  validation.reset();
 };
 
 const handleSubmit = async () => {
+  form.value.schedules = schedule.value
+    .filter((s) => s.selected && s.start && s.end)
+    .map((s) => ({
+      day: s.day,
+      start: s.start as string,
+      end: s.end as string,
+    }));
+
+  if (
+    !validation.validateAll(form.value) ||
+    !form.value.schedules ||
+    form.value.schedules.length === 0
+  ) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Pastikan semua data terisi dan pilih setidaknya satu jadwal praktek dokter',
+      life: 3000,
+    });
+    return;
+  }
+
   try {
     const payload = {
       name: form.value.name,
