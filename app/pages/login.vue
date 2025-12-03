@@ -25,7 +25,13 @@
               type="text"
               size="small"
               placeholder="Masukan username"
+              :class="{ 'p-invalid': validation.hasError('username') }"
+              @blur="validation.touch('username')"
+              @input="validation.validate('username', form.username)"
             />
+            <small v-if="validation.getError('username')" class="text-red-500">
+              {{ validation.getError('username') }}
+            </small>
           </div>
           <div class="flex flex-col items-start w-full gap-1">
             <label class="text-xs font-semibold" for="password">Password</label>
@@ -36,7 +42,13 @@
               fluid
               size="small"
               placeholder="Masukan password"
+              :class="{ 'p-invalid': validation.hasError('password') }"
+              @blur="validation.touch('password')"
+              @input="validation.validate('password', form.password)"
             />
+            <small v-if="validation.getError('password')" class="text-red-500">
+              {{ validation.getError('password') }}
+            </small>
           </div>
           <BaseButton class="w-full" size="sm" type="submit" :disabled="loading">
             <template #default>
@@ -55,10 +67,12 @@
 
 <script lang="ts" setup>
 import { useAuth } from '@/composables/api/useAuth';
+import { loginValidation } from '@/validations';
 
 const loading = ref(false);
 const router = useRouter();
 const toast = useToast();
+const validation = useValidation(loginValidation);
 const { login } = useAuth();
 const { setCookie } = useCookieManager();
 
@@ -70,9 +84,12 @@ const form = ref({
 const resetForm = () => {
   form.value.username = '';
   form.value.password = '';
+  validation.reset();
 };
 
 const handleLogin = async () => {
+  if (!validation.validateAll(form.value)) return;
+
   loading.value = true;
 
   try {
