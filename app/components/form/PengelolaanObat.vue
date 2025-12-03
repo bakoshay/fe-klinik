@@ -21,7 +21,9 @@
     <!-- content -->
     <div class="px-6 w-full items-start flex flex-col gap-4">
       <div class="flex flex-col items-start w-full gap-1">
-        <label for="name" class="font-semibold text-sm">Nama Obat</label>
+        <label for="name" class="font-semibold text-sm"
+          >Nama Obat<span class="text-red-500">*</span></label
+        >
         <InputText
           id="name"
           v-model="form.nama"
@@ -29,10 +31,18 @@
           fluid
           size="small"
           placeholder="Masukan nama dokter"
+          :class="{ 'p-invalid': validation.hasError('nama') }"
+          @blur="validation.touch('nama')"
+          @input="validation.validate('nama', form.nama)"
         />
+        <small v-if="validation.getError('nama')" class="text-red-500">
+          {{ validation.getError('nama') }}
+        </small>
       </div>
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="jenisObat" class="font-semibold text-sm">Jenis Obat</label>
+        <label for="jenisObat" class="font-semibold text-sm"
+          >Jenis Obat<span class="text-red-500">*</span></label
+        >
         <Select
           id="jenisObat"
           v-model="form.jenis"
@@ -42,10 +52,18 @@
           :options="jenisObatOptions"
           option-label="label"
           option-value="value"
+          :class="{ 'p-invalid': validation.hasError('jenis') }"
+          @blur="validation.touch('jenis')"
+          @change="validation.validate('jenis', form.jenis)"
         />
+        <small v-if="validation.getError('jenis')" class="text-red-500">
+          {{ validation.getError('jenis') }}
+        </small>
       </div>
       <div class="flex flex-col items-start w-full gap-2">
-        <label for="harga" class="font-semibold text-sm">Harga</label>
+        <label for="harga" class="font-semibold text-sm"
+          >Harga<span class="text-red-500">*</span></label
+        >
         <InputNumber
           id="harga"
           v-model="form.harga"
@@ -55,7 +73,13 @@
           fluid
           size="small"
           placeholder="Masukan harga"
+          :class="{ 'p-invalid': validation.hasError('harga') }"
+          @blur="validation.touch('harga')"
+          @input="validation.validate('harga', form.harga)"
         />
+        <small v-if="validation.getError('harga')" class="text-red-500">
+          {{ validation.getError('harga') }}
+        </small>
       </div>
       <div class="flex flex-col items-start w-full gap-2">
         <label for="status" class="font-semibold text-sm">Status Stock</label>
@@ -89,6 +113,7 @@
 
 <script setup lang="ts">
 import { useObat } from '@/composables/api/useObat';
+import { obatValidation } from '@/validations';
 import type { DataObat } from '~/types/obat';
 
 const props = defineProps({
@@ -100,6 +125,7 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const validation = useValidation(obatValidation);
 const { createObat, updateObat } = useObat();
 
 const jenisObatOptions = ref([
@@ -139,9 +165,12 @@ const resetForm = () => {
     harga: 0,
     status: true,
   };
+  validation.reset();
 };
 
 const handleSubmit = async () => {
+  if (!validation.validateAll(form.value)) return;
+
   try {
     const payload = {
       nama: form.value.nama,
