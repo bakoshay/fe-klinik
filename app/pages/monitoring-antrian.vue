@@ -51,9 +51,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useAntrianWebSocket } from '@/composables/api/useAntrianWebSocket';
+import { useAntrianSocket } from '@/composables/ws/useAntrianSocket';
 
-const { antrianData, connect, disconnect } = useAntrianWebSocket();
+const { antrianData, connect, disconnect } = useAntrianSocket();
 
 onMounted(() => {
   connect();
