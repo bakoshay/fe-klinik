@@ -68,7 +68,9 @@
         </div>
 
         <div class="flex flex-col items-start w-full gap-1">
-          <label for="nomorurut" class="font-semibold text-xs md:text-sm">Nomor Urut</label>
+          <label for="nomorurut" class="font-semibold text-xs md:text-sm"
+            >Nomor Urut<span class="text-red-500">*</span></label
+          >
           <Select
             id="nomorurut"
             v-model="noUrut"
@@ -78,7 +80,13 @@
             :options="Array.isArray(antrian.data.value?.data) ? antrian.data.value.data : []"
             option-label="nomor"
             option-value="pasien"
+            :class="{ 'p-invalid': validation.hasError('nomor_urut') }"
+            @blur="validation.touch('nomor_urut')"
+            @change="validation.validate('nomor_urut', noUrut)"
           />
+          <small v-if="validation.getError('nomor_urut')" class="text-red-500">
+            {{ validation.getError('nomor_urut') }}
+          </small>
         </div>
 
         <div v-if="namaPasien" class="flex flex-col items-start w-full gap-1">
@@ -109,7 +117,7 @@
 
         <div class="flex flex-col items-start w-full gap-1">
           <label for="jenispembayaran" class="text-xs md:text-sm font-medium"
-            >Jenis Pembayaran</label
+            >Jenis Pembayaran<span class="text-red-500">*</span></label
           >
           <Select
             size="small"
@@ -119,7 +127,13 @@
             option-label="label"
             v-model="jenisPembayaran"
             option-value="value"
+            :class="{ 'p-invalid': validation.hasError('jenis_pembayaran') }"
+            @blur="validation.touch('jenis_pembayaran')"
+            @change="validation.validate('jenis_pembayaran', jenisPembayaran)"
           />
+          <small v-if="validation.getError('jenis_pembayaran')" class="text-red-500">
+            {{ validation.getError('jenis_pembayaran') }}
+          </small>
         </div>
 
         <div v-if="jenisPembayaran === 'cash'" class="flex flex-col items-start w-full gap-1">
@@ -252,6 +266,7 @@ import ShopingCartIcon from '@/assets/icons/ShopingCartIcon.vue';
 import { useObat } from '@/composables/api/useObat';
 import { usePembayaran } from '@/composables/api/usePembayaran';
 import { useAntrian } from '@/composables/api/useAntrian';
+import { pembayaranValidation } from '@/validations';
 import type { Pembayaran } from '@/types/pembayaran';
 
 definePageMeta({
@@ -268,6 +283,7 @@ const nominalPembayaran = ref(0);
 const dataStruk = ref<Pembayaran | null>(null);
 const toast = useToast();
 const loading = ref(false);
+const validation = useValidation(pembayaranValidation);
 
 const { getByAvailable } = useObat();
 const { getAntrianByCurrentDay } = useAntrian();
@@ -307,10 +323,34 @@ const resetAll = () => {
   jenisPembayaran.value = '';
   nominalPembayaran.value = 0;
   dataStruk.value = null;
+  validation.reset();
 };
 
 // Submit
 const handleSubmit = async () => {
+  // Validasi form
+  if (
+    !validation.validateAll({
+      nomor_urut: noUrut.value,
+      jenis_pembayaran: jenisPembayaran.value,
+      nominal_pembayaran: nominalPembayaran.value,
+    })
+  )
+    return;
+
+  // Validasi nominal pembayaran khusus cash
+  if (jenisPembayaran.value === 'cash') {
+    if (!nominalPembayaran.value || Number(nominalPembayaran.value) < total.value) {
+      toast.add({
+        severity: 'error',
+        summary: 'Nominal Kurang',
+        detail: 'Nominal pembayaran kurang dari total pembayaran!',
+        life: 3000,
+      });
+      return;
+    }
+  }
+
   let jumlahBayar: number = 0;
   if (jenisPembayaran.value === 'cash') {
     jumlahBayar = Number(nominalPembayaran.value);
