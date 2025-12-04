@@ -40,6 +40,21 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ['.local', 'localhost'],
+    },
+  },
+
+  app: {
+    head: {
+      title: 'KLINIK VIRZA MEDIKA',
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { charset: 'utf-8' },
+        { name: 'theme-color', content: '#ffffff' },
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    },
   },
 
   modules: ['@nuxt/icon', '@primevue/nuxt-module'],
