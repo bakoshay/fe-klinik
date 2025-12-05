@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4">
+  <div class="min-h-screen flex items-center justify-center px-4" @click="enableBellAudio">
     <div class="bg-primary-light rounded-xl shadow-lg p-8 w-full flex flex-col items-center gap-6">
       <div class="flex flex-col items-center gap-2">
         <img src="/images/logo.png" alt="logo" class="md:size-16 size-14 lg:size-18 xl:size-28" />
@@ -52,8 +52,14 @@
 
 <script lang="ts" setup>
 import { useAntrianSocket } from '@/composables/ws/useAntrianSocket';
+import { useAntrianBell } from '@/composables/useAntrianBell';
 
 const { antrianData, connect, disconnect } = useAntrianSocket();
+const { enableAudio } = useAntrianBell();
+
+const enableBellAudio = () => {
+  enableAudio();
+};
 
 onMounted(() => {
   connect();
