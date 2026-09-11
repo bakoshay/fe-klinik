@@ -13,7 +13,7 @@
       <div class="flex flex-col justify-center items-center flex-1 p-2 md:p-8 w-full gap-6">
         <div class="flex flex-col items-center justify-center gap-1 w-full">
           <img src="/images/logo.png" alt="logo" class="md:w-20 w-16" />
-          <h2 class="font-bold md:text-2xl text-xl text-center">KLINIK VIRZA MEDIKA</h2>
+          <h2 class="font-bold md:text-2xl text-xl text-center">KLINIK VIRJA MEDIKA</h2>
         </div>
         <form class="w-full items-start flex flex-col gap-3" @submit.prevent="handleLogin">
           <div class="flex flex-col items-start w-full gap-1">

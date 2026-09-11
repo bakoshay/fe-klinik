@@ -7,7 +7,7 @@
       <div class="flex items-center gap-2">
         <img src="/images/logo.png" alt="Logo" class="md:size-8 lg:size-9 size-6" />
         <h1 class="text-primary-dark font-extrabold md:text-base lg:text-lg text-xs">
-          KLINIK VIRZA MEDIKA
+          KLINIK VIRJA MEDIKA
         </h1>
       </div>
 
@@ -60,7 +60,7 @@ const { getCookie } = useCookieManager();
 const { logOut } = useAuth();
 const { getCurrentAntrian, nextAntrian } = useAntrian();
 const { data } = await useAsyncData('currentAntrian', () =>
-  getCurrentAntrian().then((res) => res.data.value)
+  getCurrentAntrian().then((res) => res.data.value),
 );
 
 const token = getCookie('token');
